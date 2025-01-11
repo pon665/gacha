@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>鈴宮りんグッズガチャ</title>
+  <style>
+    /* メニューバーのスタイル */
+    .navbar {
+      background-color: #ffe6ea;
+      border-bottom: 2px solid #ff9aa2;
+      padding: 10px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .navbar a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: #ff6f91;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .navbar a:hover {
+      background: #ffccd5;
+      color: #555;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff5f8;
+      color: #555;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #ffe6ea;
+      border: 2px solid #ff9aa2;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(255, 153, 162, 0.3);
+    }
+    h1 {
+      font-size: 24px;
+      color: #ff6f91;
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'Georgia', serif;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ff9aa2;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      color: #555;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      background: #ff9aa2;
+      color: #fff;
+      font-size: 14px;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 3px 5px rgba(255, 153, 162, 0.4);
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ff6f91;
+    }
+    .result {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #ff6f91;
+      text-align: center;
+    }
+    .item-list {
+      width: 100%;
+      background: #fff;
+      border: 2px solid #ff9aa2;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: inset 0 2px 5px rgba(255, 153, 162, 0.2);
+      margin-bottom: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .delete-button {
+      background: #ff6f91;
+      color: #fff;
+      font-size: 12px;
+      padding: 5px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(255, 111, 145, 0.3);
+    }
+    .delete-button:hover {
+      background: #ff9aa2;
+    }
+    .history-table {
+      background: #fff;
+      border: 2px solid #ff9aa2;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: inset 0 2px 5px rgba(255, 153, 162, 0.2);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table th, table td {
+      border: 1px solid #ff9aa2;
+      padding: 8px;
+      text-align: left;
+    }
+    table th {
+      background: #ffccd5;
+      color: #555;
+    }
+    table td {
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- メニューバー -->
+  <div class="navbar">
+    <a href="summary.html">集計ページ</a>
+  </div>
+
+  <div class="container">
+    <h1>鈴宮りんのグッズガチャ</h1>
+
+    <div class="section">
+      <label for="player-name">リスナー名:</label>
+      <input type="text" id="player-name" placeholder="リスナー名を入力">
+    </div>
+
+    <div class="section">
+      <label for="gacha-count">ガチャ回数:</label>
+      <input type="number" id="gacha-count" value="1" min="1" max="10">
+      <button onclick="pullGacha()">ガチャを引く</button>
+    </div>
+<button onclick="postToX()">結果をXに投稿</button>
+
+    <div class="result" id="result">ここに結果が表示されます</div>
+
+    <div class="section">
+      <h2>景品リスト</h2>
+      <div class="item-list" id="item-list"></div>
+      <div>
+        <input type="text" id="item-name" placeholder="景品名">
+        <input type="number" id="item-rate" placeholder="確率 (%)" min="1" max="100">
+        <button onclick="addItem()">景品を追加</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>ガチャ履歴</h2>
+      <div class="history-table">
+        <table id="history-list">
+          <thead>
+            <tr>
+              <th>リスナー名</th>
+              <th>景品内容</th>
+              <th>合計回数</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button onclick="clearHistory()">履歴をクリア</button>
+      
+    </div>
+  </div>
+
+  <script>
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateItemList();
+      updateHistory();
+    });
+
+    // 景品を追加
+    function addItem() {
+      const name = document.getElementById("item-name").value.trim();
+      const rate = parseInt(document.getElementById("item-rate").value, 10);
+
+      if (name && rate > 0 && rate <= 100) {
+        items.push({ name, rate });
+        localStorage.setItem("items", JSON.stringify(items));
+        // 入力フォームをリセット
+        document.getElementById("item-name").value = "";
+        document.getElementById("item-rate").value = "";
+        updateItemList();
+      } else {
+        alert("正しい値を入力してください");
+      }
+    }
+
+    // 景品を削除
+    function deleteItem(index) {
+      if (confirm("この景品を削除しますか？")) {
+        items.splice(index, 1);
+        localStorage.setItem("items", JSON.stringify(items));
+        updateItemList();
+      }
+    }
+
+    // 景品リストを更新
+    function updateItemList() {
+      const itemList = document.getElementById("item-list");
+      itemList.innerHTML = "";
+      items.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "item-row";
+        div.innerHTML = `
+          <span>${item.name} (確率: ${item.rate}%)</span>
+          <button class="delete-button" onclick="deleteItem(${index})">削除</button>
+        `;
+        itemList.appendChild(div);
+      });
+    }
+
+    // ガチャを引く
+    function pullGacha() {
+      const playerName = document.getElementById("player-name").value.trim();
+      const count = parseInt(document.getElementById("gacha-count").value, 10);
+
+      if (!playerName) {
+        alert("リスナー名を入力してください");
+        return;
+      }
+
+      if (items.length === 0) {
+        alert("景品リストがありません。景品を追加してください。");
+        return;
+      }
+
+      const results = {};
+      for (let i = 0; i < count; i++) {
+        const random = Math.random() * 100;
+        let cumulativeRate = 0;
+        for (const item of items) {
+          cumulativeRate += item.rate;
+          if (random <= cumulativeRate) {
+            results[item.name] = (results[item.name] || 0) + 1;
+            break;
+          }
+        }
+      }
+
+      const formattedResults = Object.entries(results)
+        .map(([item, count]) => `${item} × ${count}`)
+        .join(", ");
+      document.getElementById("result").innerHTML = `結果 (${count}回): ${formattedResults}`;
+
+      // 履歴を更新
+      const existingHistory = history.find(h => h.player === playerName);
+      if (existingHistory) {
+        // 既存履歴を更新
+        existingHistory.count += count;
+        for (const [itemName, c] of Object.entries(results)) {
+          existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + c;
+        }
+      } else {
+        // 新規履歴を作成
+        history.push({
+          player: playerName,
+          count: count,
+          results: results
+        });
+      }
+
+      localStorage.setItem("history", JSON.stringify(history));
+      updateHistory();
+    }
+
+    // ガチャ履歴を表に更新
+    function updateHistory() {
+      const historyTableBody = document.querySelector("#history-list tbody");
+      historyTableBody.innerHTML = "";
+
+      history.forEach(h => {
+        const resultsText = Object.entries(h.results)
+          .map(([item, count]) => `${item} × ${count}`)
+          .join(", ");
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${h.player}</td>
+          <td>${resultsText}</td>
+          <td>${h.count}</td>
+        `;
+        historyTableBody.appendChild(row);
+      });
+    }
+
+    // 履歴をクリア
+    function clearHistory() {
+      if (confirm("履歴をクリアしますか？")) {
+        history = [];
+        localStorage.removeItem("history");
+        updateHistory();
+      }
+    }
+    
+function postToX() {
+    const resultElement = document.getElementById("result");
+    if (!resultElement || resultElement.innerText.trim() === "") {
+        alert("ガチャ結果がありません。ガチャを引いてください。");
+        return;
+    }
+
+    // ガチャ結果を取得
+    const resultText = resultElement.innerText;
+
+    // Xへの投稿用URLを生成
+    const tweetText = encodeURIComponent(`ガチャ結果:\n${resultText}`);
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+
+    // Xの投稿画面を開く
+    window.open(tweetUrl, "_blank");
+}
+    
+  </script>
+</body>
+</html>
