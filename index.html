@@ -332,8 +332,10 @@
     
 function postToX() {
     const resultElement = document.getElementById("result");
-    if (!resultElement || resultElement.innerText.trim() === "") {
-        alert("ガチャ結果がありません。ガチャを引いてください。");
+    const playerName = document.getElementById("player-name").value.trim();
+    
+    if (!resultElement || resultElement.innerText.trim() === "" || !playerName) {
+        alert("リスナー名またはガチャ結果がありません。ガチャを引いてください。");
         return;
     }
 
@@ -341,7 +343,7 @@ function postToX() {
     const resultText = resultElement.innerText;
 
     // Xへの投稿用URLを生成
-    const tweetText = encodeURIComponent(`ガチャ結果:\n${resultText}`);
+    const tweetText = encodeURIComponent(`リスナー名: ${playerName}\nガチャ結果:\n${resultText}`);
     const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
     // Xの投稿画面を開く
