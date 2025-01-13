@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>集計ページ</title>
+  <style>
+    .navbar {
+      background-color: #ffe6ea;
+      border-bottom: 2px solid #ff9aa2;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .navbar a {
+      margin-right: auto;
+      text-decoration: none;
+      color: #ff6f91;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .navbar a:hover {
+      background: #ffccd5;
+      color: #555;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff5f8;
+      color: #555;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #ffe6ea;
+      border: 2px solid #ff9aa2;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(255, 153, 162, 0.3);
+    }
+    h1 {
+      font-size: 24px;
+      color: #ff6f91;
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'Georgia', serif;
+    }
+    .summary-table {
+      background: #fff;
+      border: 2px solid #ff9aa2;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: inset 0 2px 5px rgba(255, 153, 162, 0.2);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table th, table td {
+      border: 1px solid #ff9aa2;
+      padding: 8px;
+      text-align: left;
+    }
+    table th {
+      background: #ffccd5;
+      color: #555;
+    }
+    table td {
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- ナビゲーション -->
+  <div class="navbar">
+    <a href="index.html">← 戻る</a>
+  </div>
+
+  <div class="container">
+    <h1>集計ページ</h1>
+    <div class="summary-table">
+      <table id="summary-table">
+        <thead>
+          <tr>
+            <th>景品名</th>
+            <th>出現数</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="summary-total" style="margin-top: 10px;"></p>
+    </div>
+  </div>
+
+  <script>
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+
+    // 集計用のオブジェクト
+    let aggregate = {};
+
+    // history にある全リスナーの results を合算
+    history.forEach(h => {
+      for (const [itemName, count] of Object.entries(h.results)) {
+        aggregate[itemName] = (aggregate[itemName] || 0) + count;
+      }
+    });
+
+    // 表示用にテーブルを更新
+    const summaryTableBody = document.querySelector("#summary-table tbody");
+    summaryTableBody.innerHTML = "";
+
+    let totalCount = 0;
+    for (const [itemName, count] of Object.entries(aggregate)) {
+      totalCount += count;
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${itemName}</td>
+        <td>${count}</td>
+      `;
+      summaryTableBody.appendChild(row);
+    }
+
+    document.getElementById("summary-total").textContent = `合計出現数: ${totalCount}`;
+  </script>
+</body>
+</html>
