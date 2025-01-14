@@ -146,13 +146,16 @@
   </style>
 </head>
 <body>
-  <!-- メニューバー -->
+  <!-- メニューバー -->    
   <div class="navbar">
+  <button id="mute-button" onclick="toggleMute()">ミュート</button>
     <a href="summary.html">集計ページ</a>
   </div>
+  
+  <div style="margin-top: 20px;">
 
   <div class="container">
-    <h1>鈴宮りんのグッズガチャ</h1>
+    <h1>鈴宮りんグッズガチャ</h1>
 
     <div class="section">
       <label for="player-name">リスナー名:</label>
@@ -164,6 +167,7 @@
       <input type="number" id="gacha-count" value="1" min="1" max="10">
       <button onclick="pullGacha()">ガチャを引く</button>
     </div>
+    
 <button onclick="postToX()">結果をXに投稿</button>
 
     <div class="result" id="result">ここに結果が表示されます</div>
@@ -198,70 +202,126 @@
   </div>
 
   <script>
-    let items = JSON.parse(localStorage.getItem("items")) || [];
-    let history = JSON.parse(localStorage.getItem("history")) || [];
+    let isMuted = false; // ミュート状態を保持
+let volume = 1.0; // 音量（0.0～1.0）
 
-    document.addEventListener("DOMContentLoaded", () => {
+// ミュート切り替え関数
+function toggleMute() {
+    isMuted = !isMuted; // ミュート状態を切り替え
+    const muteButton = document.getElementById("mute-button");
+    muteButton.innerText = isMuted ? "ミュート解除" : "ミュート"; // ボタン表示を更新
+}
+
+// サウンド再生関数
+function playSound(type) {
+    if (isMuted) return; // ミュート中は再生しない
+
+    let audio;
+    switch (type) {
+        case "start":
+            audio = new Audio("sounds/gacha_start.mp3"); // ガチャ開始音
+            break;
+        case "result":
+            audio = new Audio("sounds/result.mp3"); // ガチャ結果音
+            break;
+        default:
+            return;
+    }
+
+    audio.volume = volume; // 音量設定
+    audio.play().catch((e) => console.error("サウンド再生エラー:", e));
+}
+  let items = JSON.parse(localStorage.getItem("items")) || [];
+  let history = JSON.parse(localStorage.getItem("history")) || [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateItemList();
+    updateHistory();
+  });
+
+  // サウンド再生関数
+  function playSound(type) {
+    if (isMuted) return; // ミュート中は再生しない
+
+    let audio;
+    switch (type) {
+      case "start":
+        audio = new Audio("sounds/gacha_start.mp3"); // ガチャ開始音
+        break;
+      case "result":
+        audio = new Audio("sounds/result.mp3"); // ガチャ結果音
+        break;
+      default:
+        return;
+    }
+    audio.volume = volume; // 音量を設定
+    audio.play().catch((e) => console.error("サウンド再生エラー:", e));
+  }
+
+  // 景品を追加
+  function addItem() {
+    const name = document.getElementById("item-name").value.trim();
+    const rate = parseInt(document.getElementById("item-rate").value, 10);
+
+    if (name && rate > 0 && rate <= 100) {
+      items.push({ name, rate });
+      localStorage.setItem("items", JSON.stringify(items));
+      document.getElementById("item-name").value = "";
+      document.getElementById("item-rate").value = "";
       updateItemList();
-      updateHistory();
+    } else {
+      alert("正しい値を入力してください");
+    }
+  }
+
+  // 景品を削除
+  function deleteItem(index) {
+    if (confirm("この景品を削除しますか？")) {
+      items.splice(index, 1);
+      localStorage.setItem("items", JSON.stringify(items));
+      updateItemList();
+    }
+  }
+
+  // 景品リストを更新
+  function updateItemList() {
+    const itemList = document.getElementById("item-list");
+    itemList.innerHTML = "";
+    items.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "item-row";
+      div.innerHTML = `
+        <span>${item.name} (確率: ${item.rate}%)</span>
+        <button class="delete-button" onclick="deleteItem(${index})">削除</button>
+      `;
+      itemList.appendChild(div);
     });
+  }
 
-    // 景品を追加
-    function addItem() {
-      const name = document.getElementById("item-name").value.trim();
-      const rate = parseInt(document.getElementById("item-rate").value, 10);
+  // ガチャを引く
+  function pullGacha() {
+    const playerName = document.getElementById("player-name").value.trim();
+    const count = parseInt(document.getElementById("gacha-count").value, 10);
+    const resultElement = document.getElementById("result");
 
-      if (name && rate > 0 && rate <= 100) {
-        items.push({ name, rate });
-        localStorage.setItem("items", JSON.stringify(items));
-        // 入力フォームをリセット
-        document.getElementById("item-name").value = "";
-        document.getElementById("item-rate").value = "";
-        updateItemList();
-      } else {
-        alert("正しい値を入力してください");
-      }
+    if (!playerName) {
+      alert("リスナー名を入力してください");
+      return;
     }
 
-    // 景品を削除
-    function deleteItem(index) {
-      if (confirm("この景品を削除しますか？")) {
-        items.splice(index, 1);
-        localStorage.setItem("items", JSON.stringify(items));
-        updateItemList();
-      }
+    if (items.length === 0) {
+      alert("景品リストがありません。景品を追加してください。");
+      return;
     }
 
-    // 景品リストを更新
-    function updateItemList() {
-      const itemList = document.getElementById("item-list");
-      itemList.innerHTML = "";
-      items.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = "item-row";
-        div.innerHTML = `
-          <span>${item.name} (確率: ${item.rate}%)</span>
-          <button class="delete-button" onclick="deleteItem(${index})">削除</button>
-        `;
-        itemList.appendChild(div);
-      });
-    }
+    // ガチャ開始音を再生
+    playSound("start");
 
-    // ガチャを引く
-    function pullGacha() {
-      const playerName = document.getElementById("player-name").value.trim();
-      const count = parseInt(document.getElementById("gacha-count").value, 10);
+    // 一時的に「ガチャ中...」を表示
+    resultElement.innerHTML = "ガチャを引いています...";
 
-      if (!playerName) {
-        alert("リスナー名を入力してください");
-        return;
-      }
-
-      if (items.length === 0) {
-        alert("景品リストがありません。景品を追加してください。");
-        return;
-      }
-
+    // ガチャ結果を2秒後に表示
+    setTimeout(() => {
       const results = {};
       for (let i = 0; i < count; i++) {
         const random = Math.random() * 100;
@@ -278,18 +338,16 @@
       const formattedResults = Object.entries(results)
         .map(([item, count]) => `${item} × ${count}`)
         .join(", ");
-      document.getElementById("result").innerHTML = `結果 (${count}回): ${formattedResults}`;
+      resultElement.innerHTML = `結果 (${count}回): ${formattedResults}`;
 
       // 履歴を更新
       const existingHistory = history.find(h => h.player === playerName);
       if (existingHistory) {
-        // 既存履歴を更新
         existingHistory.count += count;
         for (const [itemName, c] of Object.entries(results)) {
           existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + c;
         }
       } else {
-        // 新規履歴を作成
         history.push({
           player: playerName,
           count: count,
@@ -299,44 +357,48 @@
 
       localStorage.setItem("history", JSON.stringify(history));
       updateHistory();
+
+      // ガチャ結果音を再生
+      playSound("result");
+    }, 4900); // 5秒遅延
+  }
+
+  // ガチャ履歴を表に更新
+  function updateHistory() {
+    const historyTableBody = document.querySelector("#history-list tbody");
+    historyTableBody.innerHTML = "";
+
+    history.forEach(h => {
+      const resultsText = Object.entries(h.results)
+        .map(([item, count]) => `${item} × ${count}`)
+        .join(", ");
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${h.player}</td>
+        <td>${resultsText}</td>
+        <td>${h.count}</td>
+      `;
+      historyTableBody.appendChild(row);
+    });
+  }
+
+  // 履歴をクリア
+  function clearHistory() {
+    if (confirm("履歴をクリアしますか？")) {
+      history = [];
+      localStorage.removeItem("history");
+      updateHistory();
     }
+  }
 
-    // ガチャ履歴を表に更新
-    function updateHistory() {
-      const historyTableBody = document.querySelector("#history-list tbody");
-      historyTableBody.innerHTML = "";
-
-      history.forEach(h => {
-        const resultsText = Object.entries(h.results)
-          .map(([item, count]) => `${item} × ${count}`)
-          .join(", ");
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${h.player}</td>
-          <td>${resultsText}</td>
-          <td>${h.count}</td>
-        `;
-        historyTableBody.appendChild(row);
-      });
-    }
-
-    // 履歴をクリア
-    function clearHistory() {
-      if (confirm("履歴をクリアしますか？")) {
-        history = [];
-        localStorage.removeItem("history");
-        updateHistory();
-      }
-    }
-    
-function postToX() {
+  function postToX() {
     const resultElement = document.getElementById("result");
     const playerName = document.getElementById("player-name").value.trim();
-    
+
     if (!resultElement || resultElement.innerText.trim() === "" || !playerName) {
-        alert("リスナー名またはガチャ結果がありません。ガチャを引いてください。");
-        return;
+      alert("リスナー名またはガチャ結果がありません。ガチャを引いてください。");
+      return;
     }
 
     // ガチャ結果を取得
@@ -348,8 +410,7 @@ function postToX() {
 
     // Xの投稿画面を開く
     window.open(tweetUrl, "_blank");
-}
-    
-  </script>
+  }
+</script>
 </body>
 </html>
