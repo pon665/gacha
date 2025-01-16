@@ -103,6 +103,13 @@ function pullGacha() {
         alert("景品リストがありません。景品を追加してください。");
         return;
     }
+  
+ // 確率の合計を計算
+    const totalRate = items.reduce((sum, item) => sum + item.rate, 0);
+    if (totalRate !== 100) {
+        alert(`景品の確率合計が100%ではありません（現在: ${totalRate}％）。正しく設定してください。`);
+        return;
+    }
 
     // ガチャ開始音を再生
     playSound("start");
