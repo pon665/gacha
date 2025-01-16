@@ -1,13 +1,25 @@
 let isMuted = false; // ミュート状態を保持
 let volume = 1.0; // 音量（0.0～1.0）
 
-// ミュート切り替え関数
 function toggleMute() {
   isMuted = !isMuted; // ミュート状態を切り替え
   const muteButton = document.getElementById("mute-button");
-  muteButton.innerText = isMuted ? "ミュート解除" : "ミュート"; // ボタンの表示を更新
-}
+  const muteStatus = document.getElementById("mute-status");
 
+  // ボタンのテキストを変更
+  muteButton.innerText = isMuted ? "ミュート解除" : "ミュート";
+
+  // インジケーターの状態を更新
+  muteStatus.innerText = isMuted ? "音なし" : "音あり";
+  muteStatus.classList.toggle("muted", isMuted);
+
+  // ウィンドウアラートでお知らせ
+  if (isMuted) {
+    alert("ミュート中です。音が再生されません。");
+  } else {
+    alert("ミュートが解除されました。音が再生されます。");
+  }
+}
 // サウンド再生関数
 function playSound(type) {
   if (isMuted) return; // ミュート中は再生しない
@@ -138,7 +150,7 @@ function pullGacha() {
 
         // ガチャ結果音を再生
         playSound("result");
-    }, 5000); // 5秒遅延を設定し、ガチャ中表示と同期
+    }, 4900); // 2秒遅延を設定し、ガチャ中表示と同期
 }
 
 // ガチャ履歴を表に更新
