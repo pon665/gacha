@@ -130,9 +130,9 @@ if (window.animationInterval) {
         setTimeout(() => {
             gachaImage.src = images[index];
             gachaImage.style.opacity = 1;
-        }, 100);
+        }, 150);
         index = (index + 1) % images.length;
-    }, 200);
+    }, 300);
 
     // ⏳ 5秒後にガチャ結果を表示
     setTimeout(() => {
