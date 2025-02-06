@@ -127,7 +127,7 @@ function animateCapsule() {
         if (!animationActive) return;
         gachaImage.src = images[index];
         index = (index + 1) % images.length;
-        setTimeout(animateCapsule, 80); // 🎯 スムーズな切り替え速度（150ms）
+        setTimeout(animateCapsule, 120); // 🎯 スムーズな切り替え速度（150ms）
     }
 
     animateCapsule(); // アニメーション開始
