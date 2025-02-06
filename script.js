@@ -126,9 +126,9 @@ function pullGacha() {
         setTimeout(() => {
             gachaImage.src = images[index];
             gachaImage.style.opacity = 1;
-        }, 50);
+        }, 100);
         index = (index + 1) % images.length;
-    }, 100);
+    }, 200);
 
     // ⏳ 5秒後にガチャ結果を表示
     setTimeout(() => {
