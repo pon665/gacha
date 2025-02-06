@@ -130,7 +130,7 @@ if (window.animationInterval) {
         setTimeout(() => {
             gachaImage.src = images[index];
             gachaImage.style.opacity = 1;
-        }, 75); // フェードインの時間を短縮（目に優しい）
+        }, 100); // フェードインの時間を短縮（目に優しい）
 
         index = (index + 1) % images.length;
 
