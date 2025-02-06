@@ -121,7 +121,11 @@ function pullGacha() {
     // 🔹 カプセルのアニメーション開始
     let index = 0;
     const images = ["image2.png", "image3.png","image4.png","image5.png"];
-    window.animationInterval = setInterval(() => {
+if (window.animationInterval) {
+        clearInterval(window.animationInterval); // 既存のアニメーションをリセット
+    }
+      
+  window.animationInterval = setInterval(() => {
         gachaImage.style.opacity = 0;
         setTimeout(() => {
             gachaImage.src = images[index];
