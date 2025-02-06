@@ -130,7 +130,7 @@ function pullGacha() {
         setTimeout(() => {
             gachaImage.src = images[index];
             gachaImage.style.opacity = 1;
-        }, 75);
+        }, 140);
         index = (index + 1) % images.length;
     }, 380);
 
