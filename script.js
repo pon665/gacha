@@ -130,9 +130,14 @@ if (window.animationInterval) {
         setTimeout(() => {
             gachaImage.src = images[index];
             gachaImage.style.opacity = 1;
-        }, 150);
+        }, 75); // フェードインの時間を短縮（目に優しい）
+
         index = (index + 1) % images.length;
-    }, 400);
+
+        // 🎯 徐々に切り替え速度を調整（最初は速く → 徐々に遅く）
+        if (switchSpeed < 400) {
+            switchSpeed += 20; // 速度を少しずつ遅くする
+           
 
     // ⏳ 5秒後にガチャ結果を表示
     setTimeout(() => {
