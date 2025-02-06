@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // 景品を追加
 function addItem() {
   const name = document.getElementById("item-name").value.trim();
-  const rate = parseInt(document.getElementById("item-rate").value, 10);
+  const rate = parseFloat(document.getElementById("item-rate").value);
 
   if (name && rate > 0 && rate <= 100) {
     items.push({ name, rate });
@@ -92,7 +92,11 @@ function updateItemList() {
 function pullGacha() {
     const playerName = document.getElementById("player-name").value.trim();
     const count = parseInt(document.getElementById("gacha-count").value, 10);
-    const resultElement = document.getElementById("result");
+    const gachaImage = document.getElementById("gacha-frame"); // カプセル画像
+    const resultImage = document.getElementById("result-image"); // 結果画像
+    const resultText = document.getElementById("result-text"); // 結果テキスト
+    const resultPanel = document.getElementById("gacha-result-panel"); // 結果パネル
+    const playerNameDisplay = document.getElementById("player-name-display"); // プレイヤー名表示
 
     if (!playerName) {
         alert("リスナー名を入力してください");
@@ -103,23 +107,37 @@ function pullGacha() {
         alert("景品リストがありません。景品を追加してください。");
         return;
     }
-  
- // 確率の合計を計算
+
+    // 確率の合計をチェック
     const totalRate = items.reduce((sum, item) => sum + item.rate, 0);
     if (totalRate !== 100) {
-        alert(`景品の確率合計が100%ではありません（現在: ${totalRate}％）。正しく設定してください。`);
+        alert(`景品の確率合計が100%ではありません（現在: ${totalRate.toFixed(2)}％）。正しく設定してください。`);
         return;
     }
 
-    // ガチャ開始音を再生
+    // ガチャ開始音
     playSound("start");
 
-    // 一時的に「ガチャ中...」を表示
-    resultElement.innerHTML = "ガチャを引いています...";
+    // 🔹 カプセルのアニメーション開始
+    let index = 0;
+    const images = ["image2.png", "image3.png","image4.png","image5.png"];
+    window.animationInterval = setInterval(() => {
+        gachaImage.style.opacity = 0;
+        setTimeout(() => {
+            gachaImage.src = images[index];
+            gachaImage.style.opacity = 1;
+        }, 50);
+        index = (index + 1) % images.length;
+    }, 100);
 
-    // ガチャ結果とサウンドを正確に同期させる
+    // ⏳ 5秒後にガチャ結果を表示
     setTimeout(() => {
+        clearInterval(window.animationInterval); // 🎯 アニメーションを停止
+        window.animationInterval = null;
+
+        // ガチャ結果を取得
         const results = {};
+        let selectedItem = null;
         for (let i = 0; i < count; i++) {
             const random = Math.random() * 100;
             let cumulativeRate = 0;
@@ -127,17 +145,24 @@ function pullGacha() {
                 cumulativeRate += item.rate;
                 if (random <= cumulativeRate) {
                     results[item.name] = (results[item.name] || 0) + 1;
+                    selectedItem = item.name;
                     break;
                 }
             }
         }
 
-        const formattedResults = Object.entries(results)
-            .map(([item, count]) => `${item} × ${count}`)
-            .join(", ");
-        resultElement.innerHTML = `結果 (${count}回): ${formattedResults}`;
+        // 🎉 追加の画像とテキストを表示
+        if (selectedItem) {
+            resultImage.src = `images.png`;
+            resultText.innerText = selectedItem;
+            playerNameDisplay.innerText = `リスナー名: ${playerName}`;
+            resultPanel.style.display = "block";
+        }
 
-        // 履歴を更新
+        // カプセルを最後の状態に固定
+        gachaImage.src = "image1.png";
+
+        // 🎯 履歴を保存
         const existingHistory = history.find(h => h.player === playerName);
         if (existingHistory) {
             existingHistory.count += count;
@@ -152,34 +177,44 @@ function pullGacha() {
             });
         }
 
-        localStorage.setItem("history", JSON.stringify(history)); // ローカルストレージに保存
+        // 🎯 ローカルストレージに履歴を保存
+        localStorage.setItem("history", JSON.stringify(history));
+
+        // 🎯 履歴を更新（表示用）
         updateHistory();
 
         // ガチャ結果音を再生
         playSound("result");
-    }, 4900); // 2秒遅延を設定し、ガチャ中表示と同期
+    }, 4900);
+}function closeResultPanel() {
+    document.getElementById("gacha-result-panel").style.display = "none";
 }
+function closeResultPanel() {
+    document.getElementById("gacha-result-panel").style.display = "none";
 
+    // 🎯 カプセルの画像を最初の状態に戻す
+    const gachaImage = document.getElementById("gacha-frame");
+    gachaImage.src = "image1.png"; // 最初の画像に戻す
+}
 // ガチャ履歴を表に更新
 function updateHistory() {
-  const historyTableBody = document.querySelector("#history-list tbody");
-  historyTableBody.innerHTML = "";
+    const historyTableBody = document.querySelector("#history-list tbody");
+    historyTableBody.innerHTML = "";
 
-  history.forEach(h => {
-    const resultsText = Object.entries(h.results)
-      .map(([item, count]) => `${item} × ${count}`)
-      .join(", ");
+    history.forEach(h => {
+        const resultsText = Object.entries(h.results)
+            .map(([item, count]) => `${item} × ${count}`)
+            .join(", ");
 
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${h.player}</td>
-      <td>${resultsText}</td>
-      <td>${h.count}</td>
-    `;
-    historyTableBody.appendChild(row);
-  });
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${h.player}</td>
+            <td>${resultsText}</td>
+            <td>${h.count}</td>
+        `;
+        historyTableBody.appendChild(row);
+    });
 }
-
 // 履歴をクリア
 function clearHistory() {
   if (confirm("履歴をクリアしますか？")) {
@@ -191,21 +226,21 @@ function clearHistory() {
 
 // X（Twitter）に投稿
 function postToX() {
-  const resultElement = document.getElementById("result");
-  const playerName = document.getElementById("player-name").value.trim();
+    const resultText = document.getElementById("result-text").innerText;
+    const playerName = document.getElementById("player-name-display").innerText.replace("リスナー名: ", ""); // 🎯 プレイヤー名取得
+    const resultImage = document.getElementById("result-image").src;
 
-  if (!resultElement || resultElement.innerText.trim() === "" || !playerName) {
-    alert("リスナー名またはガチャ結果がありません。ガチャを引いてください。");
-    return;
-  }
+    if (!resultText || !playerName) {
+        alert("リスナー名またはガチャ結果がありません。ガチャを引いてください。");
+        return;
+    }
 
-  // ガチャ結果を取得
-  const resultText = resultElement.innerText;
+    // ガチャ結果を取得（テキストをエンコード）
+    const tweetText = encodeURIComponent(`リスナー名: ${playerName}\nガチャ結果:\n${resultText}`);
 
-  // Xへの投稿用URLを生成
-  const tweetText = encodeURIComponent(`リスナー名: ${playerName}\nガチャ結果:\n${resultText}`);
-  const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+    // X（Twitter）の投稿URL
+    let tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
-  // Xの投稿画面を開く
-  window.open(tweetUrl, "_blank");
+    // Xの投稿画面を開く
+    window.open(tweetUrl, "_blank");
 }

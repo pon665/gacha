@@ -114,3 +114,81 @@ table th {
   background: #ffccd5;
   color: #555;
 }
+
+/* ガチャマシンの配置 */
+.gacha-machine {
+    width: 300px;
+    height: auto;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    border-radius: 15px;
+    border: 2px solid #ff9aa2;
+    box-shadow: 0 3px 10px rgba(255, 153, 162, 0.4);
+}
+
+/* カプセルアニメーション */
+#gacha-frame {
+    width: 80%;
+    height: auto;
+    transition: opacity 0.1s ease-in-out;
+}
+
+/* ガチャ結果パネル */
+.result-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: #fff;
+    border: 2px solid #ff9aa2;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(255, 153, 162, 0.3);
+    padding: 20px;
+    text-align: center;
+    display: none;
+    z-index: 1000;
+}
+
+/* 結果画像 */
+.result-content img {
+    width: 80%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+/* 結果テキスト */
+.result-overlay {
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+}
+/* プレイヤー名のスタイル */
+.player-name-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+}
+/* ボタン共通 */
+.post-button, .close-button {
+    background: #ff9aa2;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.post-button:hover {
+    background: #1da1f2; /* X（Twitter）の青色 */
+}
+
+.close-button:hover {
+    background: #ff6f91;
+}

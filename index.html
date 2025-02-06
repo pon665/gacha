@@ -26,11 +26,21 @@
       <label for="gacha-count">ガチャ回数:</label>
       <input type="number" id="gacha-count" value="1" min="1" max="10">
       <button onclick="pullGacha()">ガチャを引く</button>
+</div>
+<!-- ガチャマシンのエリア -->
+<div class="gacha-machine">
+    <img id="gacha-frame" src="image1.png" alt="Gacha Animation">
+</div>
+<!-- ガチャ結果のポップアップパネル -->
+<div id="gacha-result-panel" class="result-panel" style="display: none;">
+    <div class="result-content">
+       <p id="player-name-display" class="player-name-text"></p>
+        <img id="result-image" src="" alt="Gacha Result">
+        <div id="result-text" class="result-overlay"></div>
+        <button onclick="postToX()" class="post-button">Xに投稿</button>
+        <button onclick="closeResultPanel()" class="close-button">閉じる</button>
     </div>
-
-    <button onclick="postToX()">結果をXに投稿</button>
-
-    <div class="result" id="result">ここに結果が表示されます</div>
+</div>
 
     <div class="section">
       <h2>景品リスト</h2>
