@@ -121,20 +121,21 @@ function pullGacha() {
     // 🔹 カプセルのアニメーション開始
     let index = 0;
     const images = ["image2.png", "image3.png","image4.png","image5.png"];
-    let animationActive = true;
-    
-function animateCapsule() {
-        if (!animationActive) return;
-        gachaImage.src = images[index];
-        index = (index + 1) % images.length;
-        setTimeout(animateCapsule, 150); // 🎯 スムーズな切り替え速度（150ms）
+    if (window.animationInterval) {
+        clearInterval(window.animationInterval); // 既存のアニメーションをリセット
     }
-
-    animateCapsule(); // アニメーション開始
+    
+    window.animationInterval = setInterval(() => {
+        gachaImage.style.opacity = 0;
+        setTimeout(() => {
+            gachaImage.src = images[index];
+            gachaImage.style.opacity = 1;
+        }, 150);
+        index = (index + 1) % images.length;
+    }, 420);
 
     // ⏳ 5秒後にガチャ結果を表示
     setTimeout(() => {
-      animationActive=false;//アニメーションを停止
         clearInterval(window.animationInterval); // 🎯 アニメーションを停止
         window.animationInterval = null;
 
