@@ -75,17 +75,17 @@ button {
     font-size: 1.3rem;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
     color: white;
-    padding: 12px 25px;
+    padding: 10px 15px;
     border: none;
     border-radius: 30px;
     cursor: pointer;
     box-shadow: 2px 2px 8px rgba(255, 64, 129, 0.3);
-    transition: all 0.3s ease-in-out;
+    transition: all 0.2s ease-in-out;
 }
 
 button:hover {
     background: linear-gradient(135deg, #ff80ab, #ff4081);
-    transform: scale(1.1);
+    transform: scale(1.0);
 }
 
 /* 🎀 ガチャマシン */
