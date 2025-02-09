@@ -147,6 +147,7 @@ let probabilityTable = [];
                 results[item.name] = (results[item.name] || 0) + 1;
                 break;
             }
+            const sortedResults = shuffleResults(results);
         }
     }
     // 🔹 カプセルのアニメーション開始
@@ -236,25 +237,43 @@ function closeResultPanel() {
     gachaImage.src = "image1.png"; // 最初の画像に戻す
 }
 // ガチャ履歴を表に更新
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function shuffleResults(results) {
+    let resultArray = Object.entries(results);
+    return shuffleArray(resultArray);
+}
 function updateHistory() {
     const historyTableBody = document.querySelector("#history-list tbody");
     historyTableBody.innerHTML = "";
 
     history.forEach(h => {
-        const resultsText = Object.entries(h.results)
-            .map(([item, count]) => `${item} × ${count}`)
-            .join(", ");
+        const resultsList = document.createElement("div");
+        resultsList.classList.add("history-items");
+
+        Object.entries(h.results).forEach(([item, count]) => {
+            const listItem = document.createElement("div");
+            listItem.classList.add("history-item");
+            listItem.innerText = `${item} ×${count}`;
+            resultsList.appendChild(listItem);
+        });
 
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${h.player}</td>
-            <td>${resultsText}</td>
+            <td></td>
             <td>${h.count}</td>
         `;
+        row.cells[1].appendChild(resultsList); // 景品内容のセルにリストを追加
         historyTableBody.appendChild(row);
     });
-}
-// 履歴をクリア
+}// 履歴をクリア
 function clearHistory() {
   if (confirm("履歴をクリアしますか？")) {
     history = [];

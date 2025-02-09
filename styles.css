@@ -133,6 +133,11 @@ button:hover {
 
 /* 🎀 結果テキスト */
 .result-overlay {
+    max-height: 300px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2列にする */
+    gap: 10px; /* アイテム間の余白 */
     font-size: 18px;
     font-weight: bold;
     color: #ff4081;
@@ -168,8 +173,8 @@ button:hover {
     background: #ff4081;
 }
 
-/* 🎀 履歴テーブル */
-.item-list, .history-table {
+/* 🎀 景品リストテーブル */
+.item-list {
     background: #fff;
     border: 2px solid #ff80ab;
     border-radius: 15px;
@@ -189,4 +194,34 @@ button:hover {
 table th {
     background: #ffd1dc;
     color: #ff4081;
+}
+/* 履歴全体のデザイン */
+.history-table {
+    max-height: 300px; /* 300px以上になったらスクロール */
+    overflow-y: auto;  /* 縦スクロールを適用 */
+    border: 2px solid #ff9aa2;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+}
+
+/* 履歴の各アイテム */
+.history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 100px; /* 景品リスト自体の高さ制限 */
+    overflow-y: auto;  /* 景品リスト単体のスクロール */
+    padding: 5px;
+}
+
+/* 各景品のデザイン */
+.history-item {
+    background: #ffe6ea;
+    border: 1px solid #ff9aa2;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-weight: bold;
+    color: #ff4081;
+    text-align: center;
 }
