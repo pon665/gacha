@@ -117,7 +117,38 @@ function pullGacha() {
 
     // ガチャ開始音
     playSound("start");
+let results = {};
+let probabilityTable = [];
 
+    // ✅ 確率テーブルの作成（10000分率で管理）
+    items.forEach(item => {
+        for (let i = 0; i < item.rate * 100; i++) {
+            probabilityTable.push(item.name);
+        }
+    });
+
+    // 🎰 ガチャを回す（設定した回数分）
+    for (let i = 0; i < count; i++) {
+        let randomIndex = Math.floor(Math.random() * probabilityTable.length);
+        let selectedItem = probabilityTable[randomIndex];
+        results[selectedItem] = (results[selectedItem] || 0) + 1;
+    }
+    let cumulativeRate = 0;
+    const probabilities = items.map(item => {
+        cumulativeRate += item.rate;
+        return { name: item.name, cumulativeRate };
+    });
+
+    // 🎲 指定回数分ガチャを引く
+    for (let i = 0; i < count; i++) {
+        const random = Math.random() * 100;
+        for (const item of probabilities) {
+            if (random <= item.cumulativeRate) {
+                results[item.name] = (results[item.name] || 0) + 1;
+                break;
+            }
+        }
+    }
     // 🔹 カプセルのアニメーション開始
     let index = 0;
     const images = ["image2.png", "image3.png","image4.png","image5.png"];
@@ -158,8 +189,12 @@ function pullGacha() {
         // 🎉 追加の画像とテキストを表示
         if (selectedItem) {
             resultImage.src = `images.png`;
-            resultText.innerText = selectedItem;
-            playerNameDisplay.innerText = `リスナー名: ${playerName}`;
+ resultText.innerHTML = ""; // パネルをクリア
+    Object.entries(results).forEach(([item, num]) => {
+        const listItem = document.createElement("p");
+        listItem.innerText = `${item} × ${num}`;
+        resultText.appendChild(listItem);
+    });            playerNameDisplay.innerText = `リスナー名: ${playerName}`;
             resultPanel.style.display = "block";
         }
 
