@@ -137,7 +137,7 @@ button:hover {
     overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* 2列にする */
-    gap: 10px; /* アイテム間の余白 */
+    gap: 5px; /* アイテム間の余白 */
     font-size: 18px;
     font-weight: bold;
     color: #ff4081;
