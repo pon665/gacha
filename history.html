@@ -7,31 +7,30 @@
     <link rel="stylesheet" href="history.css">
 </head>
 <body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- ハンバーガーメニュー -->
     <div class="menu-container">
         <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
         <ul class="menu-list" id="menu-list">
             <li><a href="index.html">ホーム</a></li>
             <li><a href="history.html">ガチャ履歴</a></li>
-            <li><a href="summary.html">景品まとめ</a></li>
+            <li><a href="summary.html">景品集計</a></li>
         </ul>
     </div>
 
     <div class="container">
         <h1>ガチャ履歴</h1>
+        <div class="history-container" id="history-container">
+    <button id="screenshot-button" class="screenshot-button">📷 スクショ</button>
+    <div id="history-list"></div>
+</div>
         <table id="history-list">
             <thead>
-                <tr>
-                    <th>リスナー名</th>
-                    <th>景品内容</th>
-                    <th>合計回数</th>
-                </tr>
             </thead>
             <tbody></tbody>
         </table>
         <button onclick="clearHistory()">履歴をクリア</button>
     </div>
-
     <script src="history.js"></script>
 </body>
 </html>

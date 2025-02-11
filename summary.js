@@ -16,32 +16,43 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-});
+
+    // 🎯 履歴データを取得
     let history = JSON.parse(localStorage.getItem("history")) || [];
 
-    // 集計用のオブジェクト
+    // 🎯 集計用のオブジェクト
     let aggregate = {};
 
-    // history にある全リスナーの results を合算
+    // 🎯 history にある全リスナーの results を合算
     history.forEach(h => {
-      for (const [itemName, count] of Object.entries(h.results)) {
-        aggregate[itemName] = (aggregate[itemName] || 0) + count;
-      }
+        for (const [itemName, count] of Object.entries(h.results)) {
+            aggregate[itemName] = (aggregate[itemName] || 0) + count;
+        }
     });
 
-    // 表示用にテーブルを更新
+    // 🎯 集計テーブルを取得
     const summaryTableBody = document.querySelector("#summary-table tbody");
+    const summaryTotal = document.getElementById("summary-total");
+
+    if (!summaryTableBody || !summaryTotal) {
+        console.error("集計テーブルまたは合計出現数の要素が見つかりません。");
+        return;
+    }
+
+    // 🎯 表示用にテーブルを更新
     summaryTableBody.innerHTML = "";
 
     let totalCount = 0;
-    for (const [itemName, count] of Object.entries(aggregate)) {
-      totalCount += count;
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${itemName}</td>
-        <td>${count}</td>
-      `;
-      summaryTableBody.appendChild(row);
-    }
+    Object.entries(aggregate).forEach(([itemName, count]) => {
+        totalCount += count;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${itemName}</td>
+            <td class="item-count">×${count}</td>
+        `;
+        summaryTableBody.appendChild(row);
+    });
 
-    document.getElementById("summary-total").textContent = `合計出現数: ${totalCount}`;
+    // 🎯 合計出現数を表示
+    summaryTotal.textContent = `🎯 合計出現数: ${totalCount}`;
+});

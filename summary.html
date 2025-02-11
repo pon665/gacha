@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>集計ページ</title>
-  <link rel="stylesheet" href="summary.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガチャ景品集計</title>
+    <link rel="stylesheet" href="summary.css">
 </head>
 <body>
-  <!-- ナビゲーション -->
+
+    <!-- 🎀 ハンバーガーメニュー -->
 <div class="menu-container">
     <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
     <ul class="menu-list" id="menu-list">
         <li><a href="index.html">ホーム</a></li>
         <li><a href="history.html">ガチャ履歴</a></li>
-        <li><a href="summary.html">景品まとめ</a></li>
+        <li><a href="summary.html">景品集計</a></li>
     </ul>
 </div>
-  <div class="container">
-    <h1>集計ページ</h1>
-    <div class="summary-table">
-      <table id="summary-table">
-        <thead>
-          <tr>
-            <th>景品名</th>
-            <th>出現数</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <p id="summary-total" style="margin-top: 10px;"></p>
+
+    <!-- 🎀 集計タイトル -->
+    <h1>🎁 ガチャ景品集計</h1>
+
+    <!-- 🎀 合計出現数 -->
+    <p id="summary-total">🎯 合計出現数: 0</p>
+
+    <!-- 🎀 集計テーブル -->
+    <div class="table-container">
+        <table id="summary-table">
+            <thead>
+                <tr>
+                    <th>🎁 景品</th>
+                    <th>📦 個数</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- JSで動的に追加 -->
+            </tbody>
+        </table>
     </div>
-  </div>
-<script src="summary.js"></script>
+
+    <script src="summary.js"></script>
 </body>
 </html>

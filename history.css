@@ -34,12 +34,7 @@ body {
     background: #ffccd5;
     color: #555;
 }
-.mute-indicator{
-    display: block;
-    margin-left: 0 auto;
-    margin-right: auto;
-}
-}
+
 /* 🎀 コンテンツ全体 */
 .container {
     max-width: 800px;
@@ -80,64 +75,77 @@ button:hover {
     transform: scale(1.0);
 }
 
-.player-name-text {
-    font-size: 18px;
+
+
+.item-row,table td {
+    border: 2px solid #ff80ab;
+    padding: 5px 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    min-width: 80px;
+    white-space: auto;
+    grid-template-columns: repeat(2,1fr);
+}
+
+table th {
+     border: 3px solid #ff80ab;
+    padding: 10px;
+    border-radius: 10px;
+      text-align: center;
+    font-weight: bold;
+    min-width: 80px;
+    background: #ffd1dc;
+    color: #ff4081;
+}
+/* 履歴全体のデザイン */
+/* 🎀 縦タイルレイアウト */
+.history-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 500px;
+    margin: auto;
+}
+
+/* 🎀 各リスナーのガチャ履歴 */
+.history-tile {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    border: 2px solid #ff80ab;
+    box-shadow: 0 4px 10px rgba(255, 64, 129, 0.2);
+    text-align: left;
+}
+
+/* 🎀 リスナー名 */
+.history-header {
+    font-size: 1.2rem;
     font-weight: bold;
     color: #ff4081;
     margin-bottom: 10px;
 }
 
-.item-list {
-    background: #fff;
-    border: 2px solid #ff80ab;
-    border-radius: 15px;
-    padding: 10px;
-    box-shadow: inset 0 2px 5px rgba(255, 64, 129, 0.2);
-    margin-bottom: 20px;
-    max-height: 200px;
-    overflow-y: auto;
+/* 🎀 景品リスト（2列グリッド） */
+.history-item-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 📌 2列表示 */
+    gap: 10px;
+    border-top: 1px solid #ff80ab;
+    padding-top: 10px;
 }
 
-.item-row, table th, table td {
-    border: 2px solid #ff80ab;
-    padding: 10px;
-    text-align: left;
-}
-
-table th {
-    background: #ffd1dc;
-    color: #ff4081;
-}
-/* 履歴全体のデザイン */
-.history-table {
-    max-height: 300px; /* 300px以上になったらスクロール */
-    overflow-y: auto;  /* 縦スクロールを適用 */
-    border: 2px solid #ff9aa2;
-    border-radius: 10px;
-    padding: 10px;
-    background: #fff;
-}
-
-/* 履歴の各アイテム */
-.history-items {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    max-height: 100px; /* 景品リスト自体の高さ制限 */
-    overflow-y: auto;  /* 景品リスト単体のスクロール */
-    padding: 5px;
-}
-
-/* 各景品のデザイン */
+/* 🎀 景品バッジ */
 .history-item {
-    background: #ffe6ea;
-    border: 1px solid #ff9aa2;
-    border-radius: 8px;
+    background: #ffccd5;
     padding: 5px 10px;
+    border-radius: 8px;
     font-weight: bold;
-    color: #ff4081;
+    font-size: 14px;
     text-align: center;
+    min-width: 100px;
 }
+
 
 /* 🎀 ハンバーガーメニューのデザイン */
 .menu-container {
@@ -221,4 +229,23 @@ table th {
     color: #fff;
     border-radius: 5px;
     padding: 5px;
+}
+
+/* 🎀 スクリーンショットボタン */
+.screenshot-button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 15px;
+    background: #ff80ab;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 3px 8px rgba(255, 64, 129, 0.3);
+    transition: background 0.3s ease-in-out;
+}
+
+.screenshot-button:hover {
+    background: #ff4081;
 }
