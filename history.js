@@ -5,11 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (menuButton && menuList) {
         menuButton.addEventListener("click", function (event) {
-            event.stopPropagation(); // 🔹 クリック時のイベントバブリングを防ぐ
-            menuList.classList.toggle("show"); // 🔹 アニメーション付きで表示・非表示を切り替え
+            event.stopPropagation();
+            menuList.classList.toggle("show");
         });
 
-        // 🔹 メニュー外をクリックしたら閉じる
         document.addEventListener("click", function (event) {
             if (!menuButton.contains(event.target) && !menuList.contains(event.target)) {
                 menuList.classList.remove("show");
@@ -20,9 +19,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // 🎯 ガチャ履歴を更新
     function updateHistory() {
         const historyContainer = document.getElementById("history-list");
+        if (!historyContainer) {
+            console.error("履歴リストの要素が見つかりません。");
+            return;
+        }
         historyContainer.innerHTML = "";
 
         let history = JSON.parse(localStorage.getItem("history")) || [];
+
+        if (history.length === 0) {
+            historyContainer.innerHTML = `<p>📜 ガチャ履歴はありません。</p>`;
+            return;
+        }
 
         history.forEach(h => {
             const historyTile = document.createElement("div");
@@ -50,37 +58,52 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    updateHistory(); // 初回ロード時に履歴を更新
+
     // 🎯 履歴をクリア
-    function clearHistory() {
-        if (confirm("履歴をクリアしますか？")) {
-            localStorage.removeItem("history");
-            updateHistory();
-        }
+    const clearHistoryButton = document.getElementById("clear-history-button");
+    if (clearHistoryButton) {
+        clearHistoryButton.addEventListener("click", function () {
+            if (confirm("📢 履歴をすべて削除しますか？")) {
+                localStorage.removeItem("history");
+                updateHistory();
+                alert("✅ ガチャ履歴を削除しました！");
+            }
+        });
+    } else {
+        console.error("履歴クリアボタンが見つかりません。");
     }
 
-    updateHistory();
+    // 🎯 スクリーンショット機能
+    const screenshotButton = document.getElementById("screenshot-button");
+    if (screenshotButton) {
+        screenshotButton.addEventListener("click", function () {
+            const historyList = document.getElementById("history-list");
+            if (!historyList) {
+                alert("📌 ガチャ履歴が見つかりません。");
+                return;
+            }
 
-    // 🎯 スクリーンショット機能（確実に動作する修正版）
-    document.getElementById("screenshot-button").addEventListener("click", function () {
-        html2canvas(document.getElementById("history-list"), {
-            scale: 2, // 高解像度
-            useCORS: true, // CORSエラー対策
-            allowTaint: true,
-            logging: false
-        }).then(canvas => {
-            const now = new Date();
-            const timestamp = now.toISOString().replace(/[-:.]/g, ""); // 例: 20240207153000
-            const playerName = prompt("保存するファイル名を入力してください（入力無しも可）") || "gacha_history";
-            const fileName = `${playerName}_${timestamp}.png`;
+            html2canvas(historyList, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const now = new Date();
+                const timestamp = now.toISOString().replace(/[-:.]/g, "");
+                const playerName = prompt("保存するファイル名を入力してください（入力無しも可）") || "gacha_history";
+                const fileName = `${playerName}_${timestamp}.png`;
 
-            // 画像をダウンロード
-            let link = document.createElement("a");
-            link.href = canvas.toDataURL("image/png");
-            link.download = fileName;
-            link.click();
-        }).catch(error => {
-            console.error("スクリーンショットの保存に失敗しました:", error);
-            alert("スクリーンショットの保存に失敗しました。");
+                let link = document.createElement("a");
+                link.href = canvas.toDataURL("image/png");
+                link.download = fileName;
+                link.click();
+            }).catch(error => {
+                console.error("スクリーンショットの保存に失敗しました:", error);
+                alert("❌ スクリーンショットの保存に失敗しました。");
+            });
         });
-    });
+    } else {
+        console.error("スクリーンショットボタンが見つかりません。");
+    }
 });
