@@ -4,14 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>集計ページ</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="summary.css">
 </head>
 <body>
   <!-- ナビゲーション -->
-  <div class="navbar">
-    <a href="index.html">← 戻る</a>
-  </div>
-
+<div class="menu-container">
+    <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
+    <ul class="menu-list" id="menu-list">
+        <li><a href="index.html">ホーム</a></li>
+        <li><a href="history.html">ガチャ履歴</a></li>
+        <li><a href="summary.html">景品まとめ</a></li>
+    </ul>
+</div>
   <div class="container">
     <h1>集計ページ</h1>
     <div class="summary-table">
@@ -27,36 +31,6 @@
       <p id="summary-total" style="margin-top: 10px;"></p>
     </div>
   </div>
-
-  <script>
-    let history = JSON.parse(localStorage.getItem("history")) || [];
-
-    // 集計用のオブジェクト
-    let aggregate = {};
-
-    // history にある全リスナーの results を合算
-    history.forEach(h => {
-      for (const [itemName, count] of Object.entries(h.results)) {
-        aggregate[itemName] = (aggregate[itemName] || 0) + count;
-      }
-    });
-
-    // 表示用にテーブルを更新
-    const summaryTableBody = document.querySelector("#summary-table tbody");
-    summaryTableBody.innerHTML = "";
-
-    let totalCount = 0;
-    for (const [itemName, count] of Object.entries(aggregate)) {
-      totalCount += count;
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${itemName}</td>
-        <td>${count}</td>
-      `;
-      summaryTableBody.appendChild(row);
-    }
-
-    document.getElementById("summary-total").textContent = `合計出現数: ${totalCount}`;
-  </script>
+<script src="summary.js"></script>
 </body>
 </html>

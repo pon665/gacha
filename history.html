@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガチャ履歴</title>
+    <link rel="stylesheet" href="history.css">
+</head>
+<body>
+    <!-- ハンバーガーメニュー -->
+    <div class="menu-container">
+        <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
+        <ul class="menu-list" id="menu-list">
+            <li><a href="index.html">ホーム</a></li>
+            <li><a href="history.html">ガチャ履歴</a></li>
+            <li><a href="summary.html">景品まとめ</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1>ガチャ履歴</h1>
+        <table id="history-list">
+            <thead>
+                <tr>
+                    <th>リスナー名</th>
+                    <th>景品内容</th>
+                    <th>合計回数</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button onclick="clearHistory()">履歴をクリア</button>
+    </div>
+
+    <script src="history.js"></script>
+</body>
+</html>

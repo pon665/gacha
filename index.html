@@ -11,7 +11,14 @@
   <div class="navbar">
   <button id="mute-button" onclick="toggleMute()">ミュート</button>
   <span id="mute-status" class="mute-indicator">音あり</span>
-  <a href="summary.html">集計ページ</a>
+  </div>
+<div class="menu-container">
+    <div class="hamburger-menu" onclick="toggleMenu()">☰</div>
+    <ul class="menu-list" id="menu-list">
+        <li><a href="index.html">ホーム</a></li>
+        <li><a href="history.html">ガチャ履歴</a></li>
+        <li><a href="summary.html">景品まとめ</a></li>
+    </ul>
 </div>
 
   <div class="container">
@@ -51,24 +58,6 @@
         <button onclick="addItem()">景品を追加</button>
       </div>
     </div>
-
-    <div class="section">
-      <h2>ガチャ履歴</h2>
-      <div class="history-table">
-        <table id="history-list">
-          <thead>
-            <tr>
-              <th>リスナー名</th>
-              <th>景品内容</th>
-              <th>合計回数</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <button onclick="clearHistory()">履歴をクリア</button>
-    </div>
-  </div>
 
   <script src="script.js"></script>
 </body>

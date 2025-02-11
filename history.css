@@ -61,19 +61,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* 🎀 フォーム */
-input[type="text"], input[type="number"] {
-    width: 90%;
-    padding: 12px;
-    border: 2px solid #ff80ab;
-    border-radius: 15px;
-    font-size: 16px;
-    background: #fff;
-    color: #ff4081;
-    text-align: center;
-    box-shadow: inset 0 2px 5px rgba(255, 64, 129, 0.2);
-}
-
 /* 🎀 ボタン */
 button {
     font-family: 'Fredoka One', sans-serif;
@@ -93,64 +80,6 @@ button:hover {
     transform: scale(1.0);
 }
 
-/* 🎀 ガチャマシン */
-.gacha-machine {
-    width: 220px;
-    margin: 20px auto;
-    padding: 10px;
-    background: #fff;
-    border-radius: 20px;
-    border: 3px solid #ff80ab;
-    box-shadow: 0 3px 10px rgba(255, 64, 129, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* 🎀 カプセルアニメーション */
-#gacha-frame {
-    width: 85%;
-    transition: opacity 0.2s ease-in-out;
-}
-
-/* 🎀 結果パネル */
-.result-panel {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 320px;
-    background: #fff;
-    border: 3px solid #ff80ab;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(255, 64, 129, 0.3);
-    padding: 20px;
-    text-align: center;
-    display: none;
-    z-index: 1000;
-}
-
-/* 🎀 結果画像 */
-.result-content img {
-    width: 80%;
-    margin-bottom: 10px;
-}
-
-/* 🎀 結果テキスト */
-.result-overlay {
-    max-height: 300px;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2列にする */
-    gap: 5px; /* アイテム間の余白 */
-    font-size: 18px;
-    font-weight: bold;
-    color: #ff4081;
-    text-shadow: 1px 1px 5px rgba(255, 64, 129, 0.3);
-    margin-bottom: 10px;
-}
-
-/* 🎀 プレイヤー名 */
 .player-name-text {
     font-size: 18px;
     font-weight: bold;
@@ -158,27 +87,6 @@ button:hover {
     margin-bottom: 10px;
 }
 
-/* 🎀 ボタン（閉じる・投稿） */
-.post-button, .close-button {
-    background: #ff80ab;
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    margin: 5px;
-    font-size: 1rem;
-}
-
-.post-button:hover {
-    background: #1da1f2;
-}
-
-.close-button:hover {
-    background: #ff4081;
-}
-
-/* 🎀 景品リストテーブル */
 .item-list {
     background: #fff;
     border: 2px solid #ff80ab;

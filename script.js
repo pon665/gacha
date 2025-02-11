@@ -1,7 +1,25 @@
 let isMuted = false; // ミュート状態を保持
 let volume = 1.0; // 音量（0.0～1.0）
 
-function toggleMute() {
+document.addEventListener("DOMContentLoaded", function () {
+    // 🎯 ハンバーガーメニューの開閉処理
+    const menuButton = document.querySelector(".hamburger-menu");
+    const menuList = document.querySelector(".menu-list");
+
+    if (menuButton && menuList) {
+        menuButton.addEventListener("click", function (event) {
+            event.stopPropagation(); // 🔹 クリック時のイベントバブリングを防ぐ
+            menuList.classList.toggle("show"); // 🔹 アニメーション付きで表示・非表示を切り替え
+        });
+
+        // 🔹 メニュー外をクリックしたら閉じる
+        document.addEventListener("click", function (event) {
+            if (!menuButton.contains(event.target) && !menuList.contains(event.target)) {
+                menuList.classList.remove("show");
+            }
+        });
+    }
+});function toggleMute() {
   isMuted = !isMuted; // ミュート状態を切り替え
   const muteButton = document.getElementById("mute-button");
   const muteStatus = document.getElementById("mute-status");
@@ -202,26 +220,13 @@ let probabilityTable = [];
         // カプセルを最後の状態に固定
         gachaImage.src = "image1.png";
 
-        // 🎯 履歴を保存
-        const existingHistory = history.find(h => h.player === playerName);
-        if (existingHistory) {
-            existingHistory.count += count;
-            for (const [itemName, c] of Object.entries(results)) {
-                existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + c;
-            }
-        } else {
-            history.push({
-                player: playerName,
-                count: count,
-                results: results
-            });
-        }
+// 🎯 `localStorage` に履歴を保存
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+    history.push({ player: playerName, count, results });
+    localStorage.setItem("history", JSON.stringify(history));
 
-        // 🎯 ローカルストレージに履歴を保存
-        localStorage.setItem("history", JSON.stringify(history));
-
-        // 🎯 履歴を更新（表示用）
-        updateHistory();
+    // 🎯 履歴ページを更新
+    updateHistory();
 
         // ガチャ結果音を再生
         playSound("result");
@@ -274,13 +279,6 @@ function updateHistory() {
         historyTableBody.appendChild(row);
     });
 }// 履歴をクリア
-function clearHistory() {
-  if (confirm("履歴をクリアしますか？")) {
-    history = [];
-    localStorage.removeItem("history"); // ローカルストレージから削除
-    updateHistory();
-  }
-}
 
 // X（Twitter）に投稿
 function postToX() {
