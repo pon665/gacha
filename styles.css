@@ -157,9 +157,16 @@ button:hover {
     color: #ff4081;
     margin-bottom: 10px;
 }
+.result-buttons {
+    display: flex; /* 横並びにする */
+    justify-content: center; /* 中央揃え */
+    align-items: center; /* 縦の位置を揃える */
+    gap: 15px; /* ボタン同士の間隔 */
+    margin-top: 15px;
+}
 
 /* 🎀 ボタン（閉じる・投稿） */
-.post-button, .close-button {
+.close-button {
     background: #ff80ab;
     color: white;
     padding: 12px;
@@ -169,14 +176,43 @@ button:hover {
     margin: 5px;
     font-size: 1rem;
 }
-
-.post-button:hover {
-    background: #1da1f2;
-}
-
 .close-button:hover {
     background: #ff4081;
 }
+
+/* 🎀 X（Twitter）投稿ボタン */
+.x-post-button {
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: auto;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease-in-out;
+}
+
+.post-button {
+    background: black;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* SVGのサイズを調整 */
+.x-logo {
+    width: 30px;
+    height: 30px;
+}
+
 
 /* 🎀 景品リストテーブル */
 .item-list {

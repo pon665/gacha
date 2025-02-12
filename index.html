@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ガチャメーカー</title>
   <link rel="stylesheet" href="styles.css">
+  
 </head>
 <body>
   <!-- メニューバー -->
@@ -38,17 +39,6 @@
 <div class="gacha-machine">
     <img id="gacha-frame" src="image1.png" alt="Gacha Animation">
 </div>
-<!-- ガチャ結果のポップアップパネル -->
-<div id="gacha-result-panel" class="result-panel" style="display: none;">
-    <div class="result-content">
-       <p id="player-name-display" class="player-name-text"></p>
-        <img id="result-image" src="" alt="Gacha Result">
-        <div id="result-text" class="result-overlay"></div>
-        <button onclick="postToX()" class="post-button">Xに投稿</button>
-        <button onclick="closeResultPanel()" class="close-button">閉じる</button>
-    </div>
-</div>
-
     <div class="section">
       <h2>景品リスト</h2>
       <div class="item-list" id="item-list"></div>
@@ -58,6 +48,24 @@
         <button onclick="addItem()">景品を追加</button>
       </div>
     </div>
+    
+<!-- ガチャ結果のポップアップパネル -->
+<div id="gacha-result-panel" class="result-panel" style="display: none;">
+    <div class="result-content">
+       <p id="player-name-display" class="player-name-text"></p>
+        <img id="result-image" src="" alt="Gacha Result">
+        <div id="result-text" class="result-overlay"></div>
+        </div>
+        <div class="result-button">
+        <button onclick="postToX()" class="post-button">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.24 1H21l-7.51 8.62L22.93 23H16.9l-5.33-7.86L5.28 23H1.5l8.02-9.19L1.31 1H7.5l4.76 7.28L17.24 1Z"/>
+    </svg>
+</button>
+        <button onclick="closeResultPanel()" class="close-button">閉じる</button>
+    </div>
+</div>
+
 
   <script src="script.js"></script>
 </body>

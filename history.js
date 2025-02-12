@@ -32,21 +32,37 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // 🎯 同じプレイヤー名の履歴を統合
+        let mergedHistory = {};
+
         history.forEach(h => {
+            if (!mergedHistory[h.player]) {
+                mergedHistory[h.player] = { count: 0, results: {} };
+            }
+            mergedHistory[h.player].count += h.count;
+
+            // 🎯 景品を合算
+            Object.entries(h.results).forEach(([item, count]) => {
+                mergedHistory[h.player].results[item] = (mergedHistory[h.player].results[item] || 0) + count;
+            });
+        });
+
+        // 🎯 履歴をリストとして表示
+        Object.entries(mergedHistory).forEach(([player, data]) => {
             const historyTile = document.createElement("div");
             historyTile.classList.add("history-tile");
 
-            // 🎯 リスナー名
+            // 🎯 リスナー名 + 合計回数
             const listenerName = document.createElement("div");
             listenerName.classList.add("history-header");
-            listenerName.textContent = `🔔 ${h.player}`;
+            listenerName.textContent = `🔔 ${player} (合計: ${data.count}回)`;
             historyTile.appendChild(listenerName);
 
             // 🎯 景品リスト（横2列）
             const itemList = document.createElement("div");
             itemList.classList.add("history-item-list");
 
-            Object.entries(h.results).forEach(([item, count]) => {
+            Object.entries(data.results).forEach(([item, count]) => {
                 const itemDiv = document.createElement("span");
                 itemDiv.classList.add("history-item");
                 itemDiv.textContent = `${item} ×${count}`;

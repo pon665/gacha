@@ -19,45 +19,73 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-});function toggleMute() {
-  isMuted = !isMuted; // ミュート状態を切り替え
-  const muteButton = document.getElementById("mute-button");
-  const muteStatus = document.getElementById("mute-status");
+});
+document.addEventListener("DOMContentLoaded", function () {
+    // 🎯 ミュート状態を `localStorage` から取得
+    let isMuted = JSON.parse(localStorage.getItem("isMuted")) || false; // `true` / `false` に変換
 
-  // ボタンのテキストを変更
-  muteButton.innerText = isMuted ? "ミュート解除" : "ミュート";
+    console.log("🎯 初期ミュート状態:", isMuted); // ✅ 初期状態を確認
 
-  // インジケーターの状態を更新
-  muteStatus.innerText = isMuted ? "音なし" : "音あり";
-  muteStatus.classList.toggle("muted", isMuted);
+    // 🎯 UI を更新
+    updateMuteUI(isMuted);
 
-  // ウィンドウアラートでお知らせ
-  if (isMuted) {
-    alert("ミュート中です。音が再生されません。");
-  } else {
-    alert("ミュートが解除されました。音が再生されます。");
-  }
+    // 🎯 ミュートボタンの取得
+    const muteButton = document.getElementById("mute-button");
+    if (!muteButton) {
+        console.error("❌ ミュートボタンが見つかりません。");
+        return;
+    }
+
+    // 🎯 ミュートボタンのイベントリスナーを設定
+    muteButton.addEventListener("click", function () {
+        isMuted = !isMuted; // 🎯 ミュート状態を切り替え
+        localStorage.setItem("isMuted", JSON.stringify(isMuted)); // 🎯 `true` / `false` を文字列ではなく JSON で保存
+        console.log("✅ ミュート状態が変更:", isMuted); // ✅ 切り替えた状態を確認
+        updateMuteUI(isMuted);
+    });
+});
+
+// 🎯 ミュート状態のUIを更新する関数
+function updateMuteUI(isMuted) {
+    const muteButton = document.getElementById("mute-button");
+    const muteStatus = document.getElementById("mute-status");
+
+    if (muteButton && muteStatus) {
+        muteButton.innerText = isMuted ? "🔇 ミュート解除" : "🔊 ミュート";
+        muteStatus.innerText = isMuted ? "🔕 音なし" : "🔔 音あり";
+        muteStatus.classList.toggle("muted", isMuted);
+    } else {
+        console.error("❌ ミュートボタンまたはミュートステータスが見つかりません。");
+    }
 }
-// サウンド再生関数
+
+// 🎯 サウンド再生関数（ミュート時は再生しない）
 function playSound(type) {
-  if (isMuted) return; // ミュート中は再生しない
+    let isMuted = JSON.parse(localStorage.getItem("isMuted")) || false;
+    if (isMuted) {
+        console.warn("🔕 ミュート中のため、サウンドは再生されません。");
+        return; // ミュート時は再生しない
+    }
 
-  let audio;
-  switch (type) {
-    case "start":
-      audio = new Audio("sounds/gacha_start.mp3"); // ガチャ開始音
-      break;
-    case "result":
-      audio = new Audio("sounds/result.mp3"); // ガチャ結果音
-      break;
-    default:
-      return;
-  }
+    let audio;
+    switch (type) {
+        case "start":
+            audio = new Audio("sounds/gacha_start.mp3"); // 🎰 ガチャ開始音
+            break;
+        case "result":
+            audio = new Audio("sounds/result.mp3"); // 🎰 ガチャ結果音
+            break;
+        default:
+            console.error("❌ 不明なサウンドタイプ:", type);
+            return;
+    }
 
-  audio.volume = volume; // 音量設定
-  audio.play().catch((e) => console.error("サウンド再生エラー:", e));
+    // ✅ 再生できない場合のエラーハンドリング
+    audio.volume = 1.0;
+    audio.play()
+        .then(() => console.log(`🎵 ${type}.mp3 を再生しました`))
+        .catch(e => console.error(`🔊 サウンド再生エラー (${type}):`, e));
 }
-
 let items = JSON.parse(localStorage.getItem("items")) || []; // 景品リストの初期化
 let history = JSON.parse(localStorage.getItem("history")) || []; // ガチャ履歴の初期化
 
@@ -230,7 +258,7 @@ let probabilityTable = [];
 
         // ガチャ結果音を再生
         playSound("result");
-    }, 4900);
+    }, 4800);
 }function closeResultPanel() {
     document.getElementById("gacha-result-panel").style.display = "none";
 }
