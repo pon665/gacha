@@ -123,3 +123,73 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error("スクリーンショットボタンが見つかりません。");
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+    let sortType = localStorage.getItem("sortType") || "newest"; // 🔹 デフォルトは新しい順
+
+    const historyContainer = document.getElementById("history-list");
+    const sortNewestButton = document.getElementById("sort-newest");
+    const sortNameButton = document.getElementById("sort-name");
+
+    console.log("🔍 初期ソートタイプ:", sortType);
+
+    function updateHistory() {
+        history = JSON.parse(localStorage.getItem("history")) || []; // 🔹 最新の履歴データを取得
+
+        if (sortType === "newest") {
+            history.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)); // 新しい順
+        } else if (sortType === "name") {
+            history.sort((a, b) => a.player.localeCompare(b.player, "ja")); // 名前順（日本語対応）
+        }
+
+        historyContainer.innerHTML = "";
+
+        if (history.length === 0) {
+            historyContainer.innerHTML = `<p>📜 ガチャ履歴はありません。</p>`;
+            return;
+        }
+
+        history.forEach(h => {
+            const historyTile = document.createElement("div");
+            historyTile.classList.add("history-tile");
+
+            const listenerName = document.createElement("div");
+            listenerName.classList.add("history-header");
+            listenerName.textContent = `🔔 ${h.player}`;
+            historyTile.appendChild(listenerName);
+
+            const itemList = document.createElement("div");
+            itemList.classList.add("history-item-list");
+
+            Object.entries(h.results).forEach(([item, count]) => {
+                const itemDiv = document.createElement("span");
+                itemDiv.classList.add("history-item");
+                itemDiv.textContent = `${item} ×${count}`;
+                itemList.appendChild(itemDiv);
+            });
+
+            historyTile.appendChild(itemList);
+            historyContainer.appendChild(historyTile);
+        });
+
+        console.log("📌 履歴が更新されました。");
+    }
+
+    // 🎯 並べ替えボタンのイベントリスナー
+    sortNewestButton.addEventListener("click", function () {
+        console.log("🆕 新しい順がクリックされました");
+        sortType = "newest";
+        localStorage.setItem("sortType", sortType);
+        updateHistory();
+    });
+
+    sortNameButton.addEventListener("click", function () {
+        console.log("🔤 名前順がクリックされました");
+        sortType = "name";
+        localStorage.setItem("sortType", sortType);
+        updateHistory();
+    });
+
+    updateHistory(); // 🎯 初回ロード時に適用
+});

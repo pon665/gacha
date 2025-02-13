@@ -56,16 +56,14 @@
         <img id="result-image" src="" alt="Gacha Result">
         <div id="result-text" class="result-overlay"></div>
         </div>
-        <div class="result-button">
-        <button onclick="postToX()" class="post-button">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17.24 1H21l-7.51 8.62L22.93 23H16.9l-5.33-7.86L5.28 23H1.5l8.02-9.19L1.31 1H7.5l4.76 7.28L17.24 1Z"/>
-    </svg>
-</button>
-        <button onclick="closeResultPanel()" class="close-button">閉じる</button>
-    </div>
+        <!-- 結果パネルのボタン配置 -->
+<div class="result-buttons">
+    <!-- X（Twitter）投稿ボタン -->
+    <img id="post-x-button" src="logo-white.png" class="png-icon" alt="Xに投稿">
+    
+    <!-- 閉じるボタン -->
+    <button id="close-button" class="close-button">閉じる</button>
 </div>
-
 
   <script src="script.js"></script>
 </body>

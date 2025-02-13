@@ -215,3 +215,58 @@ function updateItemList() {
         itemList.appendChild(div);
     });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    // ✅ X（Twitter）投稿ボタンの処理
+    const postXButton = document.getElementById("post-x-button");
+    if (postXButton) {
+        postXButton.addEventListener("click", function () {
+            const resultTextElement = document.getElementById("result-text");
+            const playerNameElement = document.getElementById("player-name-display");
+
+            if (!resultTextElement || !playerNameElement) {
+                alert("⚠️ リスナー名またはガチャ結果が取得できません。");
+                return;
+            }
+
+            const resultText = resultTextElement.innerText.trim();
+            const playerName = playerNameElement.innerText.replace("リスナー名: ", "").trim();
+
+            if (!resultText || !playerName) {
+                alert("⚠️ リスナー名またはガチャ結果がありません。ガチャを引いてください。");
+                return;
+            }
+
+            const tweetText = encodeURIComponent(`リスナー名: ${playerName}\nガチャ結果:\n${resultText}`);
+            const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+            window.open(tweetUrl, "_blank");
+        });
+    }
+
+    // ✅ 閉じるボタンの処理
+    const closeButton = document.getElementById("close-button");
+    if (closeButton) {
+        closeButton.addEventListener("click", function () {
+            document.getElementById("gacha-result-panel").style.display = "none";
+        });
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const resultOverlay = document.querySelector(".result-overlay");
+    const hintText = document.createElement("div");
+    hintText.classList.add("scroll-hint");
+    hintText.innerText = "⬆️ スクロールできます ⬇️";
+    resultOverlay.parentNode.insertBefore(hintText, resultOverlay);
+
+    function checkScroll() {
+        if (resultOverlay.scrollHeight > resultOverlay.clientHeight) {
+            hintText.style.display = "block";
+        } else {
+            hintText.style.display = "none";
+        }
+    }
+
+    checkScroll();
+    new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
+});

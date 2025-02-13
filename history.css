@@ -249,3 +249,25 @@ table th {
 .screenshot-button:hover {
     background: #ff4081;
 }
+
+.sort-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.sort-buttons button {
+    background: #ff80ab;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.sort-buttons button:hover {
+    background: #ff6ec7;
+}
