@@ -3,9 +3,28 @@
 
 body {
     font-family: 'Fredoka One', sans-serif;
-    background: linear-gradient(180deg, #ffe6ea, #fff5f8);
+    width: 95%;
+    height: 10px;
+    background-image: url(back.PNG);
+    padding: relative;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    display: flex;
     color: #ff4081;
     text-align: center;
+}
+/* 🎀 背景画像の上に半透明のレイヤーを追加 */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.6); /* 白色の半透明 */
+    z-index: -2; /* 背景より後ろに配置 */
 }
 
 /* 🎀 メニューバー */
