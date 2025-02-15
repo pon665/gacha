@@ -26,6 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
         historyContainer.innerHTML = "";
 
         let history = JSON.parse(localStorage.getItem("history")) || [];
+        
+        
 
         if (history.length === 0) {
             historyContainer.innerHTML = `<p>📜 ガチャ履歴はありません。</p>`;
@@ -136,7 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateHistory() {
         history = JSON.parse(localStorage.getItem("history")) || []; // 🔹 最新の履歴データを取得
-
+ history.forEach(h => {
+        h.results = Object.fromEntries(Object.entries(h.results).sort(([a], [b]) => a.localeCompare(b, 'ja')));
+    });
         if (sortType === "newest") {
             history.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)); // 新しい順
         } else if (sortType === "name") {

@@ -20,6 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // 🎯 履歴データを取得
     let history = JSON.parse(localStorage.getItem("history")) || [];
 
+ history.forEach(h => {
+        h.results = Object.fromEntries(Object.entries(h.results).sort(([a], [b]) => a.localeCompare(b, 'ja')));
+    });
+
     // 🎯 集計用のオブジェクト
     let aggregate = {};
 

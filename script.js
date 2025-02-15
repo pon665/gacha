@@ -204,6 +204,8 @@ function updateItemList() {
     let items = JSON.parse(localStorage.getItem("items")) || [];
     const itemList = document.getElementById("item-list");
     itemList.innerHTML = "";
+    
+     items.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
 
     items.forEach((item, index) => {
         const div = document.createElement("div");
