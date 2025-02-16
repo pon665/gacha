@@ -164,7 +164,10 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 350px;
+    width: 90%;
+    max-width: 500px; /* 最大幅を設定 */
+    height: auto;
+    max-height: 85vh; /* 画面の85%を超えないように */
     background: #fff;
     border: 3px solid #ff80ab;
     border-radius: 20px;
@@ -173,29 +176,41 @@ button:hover {
     text-align: center;
     display: none;
     z-index: 1000;
-    max-height: 80vh;
+    overflow: hidden; /* スクロールを禁止 */
+    justify-content: space-between;
 }
 
+.result-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: calc(85vh - 100px);
+    overflow-y: auto;
+}
 /* 🎀 結果画像 */
 .result-content img {
-    width: 80%;
-    margin-bottom: 10px;
+    width: 80%;  /* 画像をパネルの80%の幅に */
+    max-width: 250px; /* 画像の最大サイズを制限 */
+    height: auto; /* アスペクト比を保持 */
+    display: block;
+    margin: 0 auto;
 }
-
 /* 🎀 結果テキスト */
 .result-overlay {
-    max-height: 300px;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2列にする */
-    gap: 5px; /* アイテム間の余白 */
+    display: flex;
+    flex-wrap: wrap; /* アイテムを折り返し表示 */
+    justify-content: center; /* 中央揃え */
+    gap: 10px; /* アイテム間の余白 */
     font-size: 18px;
     font-weight: bold;
     color: #ff4081;
     text-shadow: 1px 1px 5px rgba(255, 64, 129, 0.3);
+    width: 100%;
+    max-width: 400px;
     margin-bottom: 10px;
 }
-
 /* 🎀 プレイヤー名 */
 .player-name-text {
     font-size: 18px;
@@ -206,26 +221,42 @@ button:hover {
 /* ボタンを横並びにする */
 .result-buttons {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     gap: 15px; /* ボタンの間隔 */
     margin-top: 15px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    width: 100%;
+    
 }
 
 /* Xのロゴボタンのデザイン */
 .png-icon {
-   background: #000;
-    display: block; !important
-    width: 50px; /* サイズ調整 */
+    background: black;
+    width: 50px;
     height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
+    margin-left: auto;
 }
-
 /* ホバー時のエフェクト */
 .png-icon:hover {
     transform: scale(1.1);
+}
+.close-button {
+    background: #ff80ab;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+    width: 100px;
 }
 /* 🎀 景品リストテーブル */
 .item-list {
@@ -410,6 +441,13 @@ table th {
     .navbar {
         width: 95%;
     }
+    .result-panel {
+        max-width: 600px;
+        max-height: 80vh;
+    }
+    .result-overlay {
+        font-size: 20px;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) { /* タブレット */
@@ -429,6 +467,13 @@ table th {
     }
     .navbar {
         width: 94%;
+        .result-panel {
+        max-width: 600px;
+        max-height: 80vh;
+    }
+    .result-overlay {
+        font-size: 20px;
+    }
     }
 }
 
@@ -449,5 +494,12 @@ body, h1, input, button {
     }
     .navbar {
         width: 92%;
+    }
+    .result-panel {
+        max-width: 700px;
+        max-height: 75vh;
+    }
+    .result-overlay {
+        font-size: 22px;
     }
 }
