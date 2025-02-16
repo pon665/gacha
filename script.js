@@ -1,3 +1,24 @@
+function adjustLayout() {
+    let width = window.innerWidth;
+
+    if (width >= 1025) { // PC
+        document.body.style.zoom = "2.5";
+    } else if (width >= 768) { // タブレット
+        document.body.style.zoom = "4.5";
+    } else { // スマホ
+        document.body.style.zoom = "1";
+    }
+}
+
+window.onresize = adjustLayout;
+document.addEventListener("DOMContentLoaded", function () {
+    const img = new Image();
+    img.src = "back.PNG";
+    img.onload = function () {
+        document.body.style.backgroundImage = `url('${img.src}')`;
+    };
+});
+
 // 🎯 ミュート状態の保存＆取得
 let isMuted = JSON.parse(localStorage.getItem("isMuted")) || false;
 let volume = 1.0; // 音量（0.0～1.0）
