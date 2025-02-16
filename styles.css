@@ -91,11 +91,14 @@ body::before {
 /* 🎀 タイトル */
 h1 {
     font-family: 'Mochiy Pop One', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2.1rem;
     color: #ff6ec7;
     text-shadow: 3px 3px 0px #ffd1dc, 6px 6px 0px #ff80ab;
     letter-spacing: 2px;
     margin-bottom: 20px;
+    white-space: noworp;
+    display: blok;
+    max-width: 95%;
 }
 
 /* 🎀 フォーム */
@@ -410,10 +413,10 @@ table th {
 
 @media (min-width: 768px) and (max-width: 1024px) { /* タブレット */
 .body, h1, input, button {
-        font-size: 18px;
+        font-size: 25px;
     }
     h1 {
-        font-size: 2.5rem;
+        font-size: 2.1rem;
     }
     button {
         font-size: 1.3rem;
@@ -433,7 +436,7 @@ body, h1, input, button {
         font-size: 20px;
     }
     h1 {
-        font-size: 3rem;
+        font-size: 2.1rem;
     }
     button {
         font-size: 1.5rem;
