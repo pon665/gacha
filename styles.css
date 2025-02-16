@@ -43,8 +43,8 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 92%;
-    max-width: 1100px;
+    width: 100%;
+    max-width: 1200px;
     border-radius: 0 0 10px 10px;
 }
 
@@ -104,7 +104,9 @@ h1 {
 /* 🎀 フォーム */
 input[type="text"], input[type="number"] {
     width: 100%;
-    max-width: 500px ;
+    max-width: 1000px ;
+    max-height:250px;
+    margin-bottom: 250px;
     margin: 0 auto;
     display: block;
     padding: 12px;
@@ -114,6 +116,7 @@ input[type="text"], input[type="number"] {
     background: #fff;
     color: #ff4081;
     text-align: center;
+    overflow-y: auto;
     box-shadow: inset 0 2px 5px rgba(255, 64, 129, 0.2);
 }
 
@@ -260,25 +263,50 @@ button:hover {
 }
 /* 🎀 景品リストテーブル */
 .item-list {
+    width: 100%;
+    max-width:1000px;
     background: #fff;
     border: 2px solid #ff80ab;
     border-radius: 15px;
     padding: 10px;
     box-shadow: inset 0 2px 5px rgba(255, 64, 129, 0.2);
     margin-bottom: 20px;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
 }
 
-.item-row, table th, table td {
+.item-row, table td {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
     border: 2px solid #ff80ab;
     padding: 10px;
     text-align: left;
+    margin-bottom: 5px;
 }
 
 table th {
     background: #ffd1dc;
     color: #ff4081;
+}
+.item-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4081;
+    flex-grow: 1; /* 名前が長くなっても幅を調整 */
+    text-align: left;
+}
+.item-delete {
+    background: #ff80ab;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+    white-space: nowrap; /* ボタン内のテキストを折り返さない */
 }
 /* 履歴全体のデザイン */
 .history-table {
@@ -488,7 +516,7 @@ body, h1, input, button {
         font-size: 1.5rem;
     }
     .container {
-        width: 92%;
+        width: 100%;
         height: 100%;
         max-width: 1100px;
     }
