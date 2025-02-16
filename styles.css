@@ -173,6 +173,7 @@ button:hover {
     text-align: center;
     display: none;
     z-index: 1000;
+    max-height: 80vh;
 }
 
 /* 🎀 結果画像 */
