@@ -180,9 +180,15 @@ button:hover {
     display: none;
     z-index: 1000;
     overflow: hidden; /* スクロールを禁止 */
+    overflow-y: auto; /* 🎯 縦スクロールを許可 */
+    max-height: 85vh; /* 🎯 画面の85%を超えない */
     justify-content: space-between;
 }
 
+/* 🎯 bodyのスクロールを防ぐ */
+body.no-scroll {
+    overflow: hidden;
+}
 .result-content {
     display: flex;
     flex-direction: column;
@@ -530,4 +536,43 @@ body, h1, input, button {
     .result-overlay {
         font-size: 22px;
     }
+}
+
+/* 🎀 PWAインストールポップアップ */
+.install-popup {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: none;
+    z-index: 1000;
+}
+
+.install-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#install-btn, #later-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#install-btn {
+    background: #ff4081;
+    color: white;
+}
+
+#later-btn {
+    background: #ccc;
+    color: black;
 }

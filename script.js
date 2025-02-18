@@ -56,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 🎯 景品リスト＆履歴の初期化
     updateItemList();
-    updateHistory();
 });
 
 // 🎯 ミュート状態をUIに適用
@@ -116,10 +115,36 @@ function stopGachaAnimation() {
 }
 
 // 🎯 ガチャを引く
+// 🎯 結果パネルを開くときにスクロールを禁止する
+function showResultPanel() {
+    const resultPanel = document.getElementById("gacha-result-panel");
+    if (resultPanel) {
+        resultPanel.style.display = "block";
+        document.body.style.overflow = "hidden"; // スクロールを禁止
+    }
+}
+
+// 🎯 結果パネルを閉じるときにスクロールを元に戻す
+function closeResultPanel() {
+    const resultPanel = document.getElementById("gacha-result-panel");
+    if (resultPanel) {
+        resultPanel.style.display = "none";
+        document.body.style.overflow = "auto"; // スクロールを元に戻す
+    }
+}
+
+// 🎯 閉じるボタンのイベントリスナー
+document.addEventListener("DOMContentLoaded", function () {
+    const closeButton = document.getElementById("close-button");
+    if (closeButton) {
+        closeButton.addEventListener("click", closeResultPanel);
+    }
+});
+
+// 🎯 ガチャを引く処理を修正
 function pullGacha() {
     const playerName = document.getElementById("player-name").value.trim();
     const count = parseInt(document.getElementById("gacha-count").value, 10);
-    const resultPanel = document.getElementById("gacha-result-panel");
     const resultText = document.getElementById("result-text");
     const resultImage = document.getElementById("result-image");
     const playerNameDisplay = document.getElementById("player-name-display");
@@ -162,38 +187,38 @@ function pullGacha() {
         stopGachaAnimation();
         playSound("result");
 
-        resultPanel.style.display = "block";
         resultText.innerHTML = "";
         Object.entries(results).forEach(([item, num]) => {
             const listItem = document.createElement("p");
             listItem.innerText = `${item} × ${num}`;
             resultText.appendChild(listItem);
         });
+
         playerNameDisplay.innerText = `リスナー名: ${playerName}`;
-        resultImage.src = "images.png"; // 🎯 リザルト画像を追加
+        resultImage.src = "images.png"; // 🎯 リザルト画像を設定
 
-        let history = JSON.parse(localStorage.getItem("history")) || [];
-        let existingHistory = history.find(h => h.player === playerName);
-
-        if (existingHistory) {
-            existingHistory.count += count;
-            for (const [itemName, num] of Object.entries(results)) {
-                existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + num;
-            }
-        } else {
-            history.push({ player: playerName, count, results });
-        }
-
-        localStorage.setItem("history", JSON.stringify(history));
-        updateHistory();
+        showResultPanel(); // 🎯 結果パネルを表示＆スクロール禁止
     }, 4800);
 }
-
 // 🎯 結果パネルを閉じる
+
 function closeResultPanel() {
     document.getElementById("gacha-result-panel").style.display = "none";
+    document.body.style.overflow = ""; // 🎯 スクロールを元に戻す
 }
 
+// 🎯 結果パネルを開く処理に追加
+document.addEventListener("DOMContentLoaded", function () {
+    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
+    gachaButton.addEventListener("click", function () {
+        openResultPanel();
+    });
+
+    const closeButton = document.getElementById("close-button");
+    closeButton.addEventListener("click", function () {
+        closeResultPanel();
+    });
+});
 // 🎯 景品リストの管理
 function addItem() {
     let name = document.getElementById("item-name").value.trim();
@@ -292,4 +317,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
     checkScroll();
     new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    // ✅ Service Worker登録
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js")
+            .then(() => console.log("✅ Service Worker Registered"))
+            .catch((error) => console.error("❌ Service Worker Registration Failed", error));
+            if (navigator.userAgent.match(/(iPhone|iPad|iPod)/i)) {
+    alert("📲 iPhone/iPadをご利用の場合、Safariの共有ボタンから「ホーム画面に追加」でインストールできます！");
+}
+    }
+
+    // ✅ PWAインストールプロンプト
+    let installPromptEvent;
+    window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        installPromptEvent = event;
+        showInstallPrompt();
+    });
+
+    function showInstallPrompt() {
+        const installPopup = document.getElementById("install-popup");
+        if (installPopup) {
+            installPopup.style.display = "block";
+        }
+    }
+
+    document.getElementById("install-btn").addEventListener("click", () => {
+        if (installPromptEvent) {
+            installPromptEvent.prompt();
+            installPromptEvent.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === "accepted") {
+                    console.log("✅ ユーザーがPWAをインストールしました");
+                }
+                document.getElementById("install-popup").style.display = "none";
+            });
+        }
+    });
+
+    document.getElementById("later-btn").addEventListener("click", () => {
+        document.getElementById("install-popup").style.display = "none";
+    });
+
+    // ✅ ガチャの誤タップ防止
+    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
+    gachaButton.addEventListener("click", function () {
+        gachaButton.disabled = true; // 押せなくする
+        setTimeout(() => {
+            gachaButton.disabled = false;
+        }, 5000); // 5秒後に再度押せる
+    });
 });

@@ -1,0 +1,21 @@
+{
+  "name": "ガチャメーカー",
+  "short_name": "ガチャ",
+  "description": "鈴宮りんのガチャメーカー",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff80ab",
+  "icons": [
+    {
+      "src": "capsule,192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "capsule.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
