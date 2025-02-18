@@ -370,3 +370,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 5000); // 5秒後に再度押せる
     });
 });
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (let registration of registrations) {
+            registration.unregister(); // ✅ 古い Service Worker を削除
+        }
+    });
+}
