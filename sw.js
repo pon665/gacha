@@ -24,27 +24,24 @@ self.addEventListener("install", (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll(urlsToCache);
-        }).then(() => self.skipWaiting()) // ✅ 即時適用
+        }).then(() => self.skipWaiting()) // ✅ すぐ適用
     );
 });
 
-// ✅ オフライン対応 & 更新処理
+// ✅ オフライン時でもページを開けるようにする
 self.addEventListener("fetch", (event) => {
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            // ✅ キャッシュがある場合はそのまま返す
-            if (cachedResponse) return cachedResponse;
-
-            // ✅ オンラインなら最新データを取得
-            return fetch(event.request).then((networkResponse) => {
+            return cachedResponse || fetch(event.request).then((networkResponse) => {
                 return caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone()); // ✅ 新しいキャッシュを保存
+                    cache.put(event.request, networkResponse.clone());
                     return networkResponse;
                 });
-            }).catch(() => {
-                // ✅ オフラインでキャッシュがない場合、デフォルトのオフラインページを返す
-                return caches.match("/index.html");
             });
+        }).catch(() => {
+            if (event.request.mode === "navigate") {
+                return caches.match("/index.html"); // ✅ オフライン時に index.html を表示
+            }
         })
     );
 });
@@ -56,11 +53,11 @@ self.addEventListener("activate", (event) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
-                        return caches.delete(cache); // ✅ 古いキャッシュを削除
+                        return caches.delete(cache);
                     }
                 })
             );
-        }).then(() => self.clients.claim()) // ✅ 即時反映
+        }).then(() => self.clients.claim()) // ✅ すぐ反映
     );
 });
 
