@@ -538,74 +538,47 @@ body, h1, input, button {
     }
 }
 
-/* 📱 インストールポップアップのスタイル */
-#install-popup {
+.popup {
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    width: 90%;
+    max-width: 400px;
+    background: #fff;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
     z-index: 1000;
-    width: 90%; /* 🟢 画面幅に応じてサイズ調整 */
-    max-width: 320px; /* 🟢 PCでは大きくなりすぎないよう制限 */
 }
 
-/* 📱 インストールポップアップのテキスト */
-#install-popup p {
-    font-size: 16px; /* 🟢 フォントサイズを小さめに */
-    color: #ff80ab;
-    margin-bottom: 15px;
+.popup-content h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
 }
 
-/* 📱 ボタンのスタイル */
-#install-popup .button-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+.popup-content p {
+    font-size: 16px;
+    margin-bottom: 20px;
 }
 
-/* 📱 インストールボタン */
+.popup button {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 #install-btn {
     background: #ff4081;
     color: white;
-    border: none;
-    padding: 12px;
-    flex: 1; /* 🟢 幅を自動調整 */
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
 }
 
-/* 📱 あとでボタン */
 #later-btn {
-    background: #ccc;
-    color: black;
-    border: none;
-    padding: 12px;
-    flex: 1;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-/* 📱 スマホ画面での調整 */
-@media (max-width: 768px) {
-    #install-popup {
-        width: 85%; /* 🟢 スマホではより小さめに */
-        max-width: 280px;
-        padding: 15px;
-    }
-    
-    #install-popup p {
-        font-size: 14px; /* 🟢 テキストを小さめに */
-    }
-    
-    #install-btn, #later-btn {
-        padding: 10px;
-        font-size: 13px;
-    }
+    background: gray;
+    color: white;
 }

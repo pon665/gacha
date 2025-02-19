@@ -71,3 +71,17 @@ self.addEventListener("activate", (event) => {
         }).then(() => self.clients.claim()) // ✅ 即時反映
     );
 });
+
+self.addEventListener("notificationclick", (event) => {
+    event.notification.close();
+
+    if (event.action === "install") {
+        self.clients.matchAll().then((clients) => {
+            clients.forEach((client) => client.postMessage({ action: "install" }));
+        });
+    } else if (event.action === "dismiss") {
+        self.clients.matchAll().then((clients) => {
+            clients.forEach((client) => client.postMessage({ action: "dismiss" }));
+        });
+    }
+});

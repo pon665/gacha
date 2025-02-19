@@ -319,48 +319,6 @@ document.addEventListener("DOMContentLoaded", function () {
     new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    // ✅ Service Worker登録
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("sw.js")
-            .then(() => console.log("✅ Service Worker Registered"))
-            .catch((error) => console.error("❌ Service Worker Registration Failed", error));
-            if (navigator.userAgent.match(/(iPhone|iPad|iPod)/i)) {
-    alert("📲 iPhone/iPadをご利用の場合、Safariの共有ボタンから「ホーム画面に追加」でインストールできます！");
-}
-    }
-
-    // ✅ PWAインストールプロンプト
-    let installPromptEvent;
-    window.addEventListener("beforeinstallprompt", (event) => {
-        event.preventDefault();
-        installPromptEvent = event;
-        showInstallPrompt();
-    });
-
-    function showInstallPrompt() {
-        const installPopup = document.getElementById("install-popup");
-        if (installPopup) {
-            installPopup.style.display = "block";
-        }
-    }
-
-    document.getElementById("install-btn").addEventListener("click", () => {
-        if (installPromptEvent) {
-            installPromptEvent.prompt();
-            installPromptEvent.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === "accepted") {
-                    console.log("✅ ユーザーがPWAをインストールしました");
-                }
-                document.getElementById("install-popup").style.display = "none";
-            });
-        }
-    });
-
-    document.getElementById("later-btn").addEventListener("click", () => {
-        document.getElementById("install-popup").style.display = "none";
-    });
-
     // ✅ ガチャの誤タップ防止
     const gachaButton = document.querySelector("button[onclick='pullGacha()']");
     gachaButton.addEventListener("click", function () {
@@ -369,7 +327,6 @@ document.addEventListener("DOMContentLoaded", function () {
             gachaButton.disabled = false;
         }, 5000); // 5秒後に再度押せる
     });
-});
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.getRegistrations().then((registrations) => {
@@ -378,3 +335,54 @@ if ("serviceWorker" in navigator) {
         }
     });
 }
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+        .then((registration) => {
+            console.log("✅ Service Worker Registered", registration);
+        })
+        .catch((error) => {
+            console.error("❌ Service Worker Registration Failed", error);
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const installPopup = document.getElementById("install-popup");
+    const installBtn = document.getElementById("install-btn");
+    const laterBtn = document.getElementById("later-btn");
+
+    // ✅ PWAがインストール済みかを判定する関数
+    function isPWAInstalled() {
+        return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem("pwaInstalled") === "true");
+    }
+
+    // ✅ 1日後に再表示するためのチェック
+    function shouldShowPopup() {
+        const lastDismissTime = localStorage.getItem("lastDismissTime");
+        if (!lastDismissTime) return true; // 初回訪問時は表示
+        const oneDayLater = parseInt(lastDismissTime) + (24 * 60 * 60 * 1000); // 1日後のタイムスタンプ
+        return Date.now() > oneDayLater; // 1日経過していれば表示
+    }
+
+    // ✅ ポップアップを表示
+    function showInstallPopup() {
+        if (!isPWAInstalled() && shouldShowPopup()) {
+            installPopup.style.display = "block";
+        }
+    }
+
+    // ✅ 「インストール」ボタンを押した場合
+    installBtn.addEventListener("click", () => {
+        localStorage.setItem("pwaInstalled", "true"); // PWAインストール済みを記録
+        installPopup.style.display = "none";
+    });
+
+    // ✅ 「あとで」ボタンを押した場合
+    laterBtn.addEventListener("click", () => {
+        localStorage.setItem("lastDismissTime", Date.now().toString()); // 現在の時間を記録
+        installPopup.style.display = "none";
+    });
+
+    // ✅ ページロード時にポップアップをチェック
+    showInstallPopup();
+});
