@@ -1,4 +1,4 @@
-const CACHE_NAME = "gacha-cache-v5"; // ✅ キャッシュ名を更新
+const CACHE_NAME = "gacha-cache-v6"; // ✅ キャッシュ名を更新
 const OFFLINE_URL = "/index.html";  // ✅ オフライン時の表示ページ
 const urlsToCache = [
     "/",
@@ -28,13 +28,28 @@ self.addEventListener("install", (event) => {
     );
 });
 
-// ✅ オフライン時に `index.html` を返すよう修正
+// ✅ オフライン時に `index.html` を返す & IndexedDB の履歴データを提供
 self.addEventListener("fetch", (event) => {
-    if (event.request.mode === "navigate") { // ✅ ページ遷移時の処理
+    if (event.request.mode === "navigate") { 
+        // ✅ ページ遷移時（オフラインなら `index.html` を返す）
         event.respondWith(
             fetch(event.request).catch(() => caches.match(OFFLINE_URL))
         );
+    } else if (event.request.url.endsWith("/history")) {
+        // ✅ 履歴データのリクエスト時、IndexedDB のデータを返す
+        event.respondWith(
+            getOfflineGachaHistory().then((data) => {
+                return new Response(JSON.stringify(data), {
+                    headers: { "Content-Type": "application/json" }
+                });
+            }).catch(() => {
+                return new Response(JSON.stringify([]), {
+                    headers: { "Content-Type": "application/json" }
+                });
+            })
+        );
     } else {
+        // ✅ キャッシュがある場合は返し、ない場合はネットワークから取得
         event.respondWith(
             caches.match(event.request).then((cachedResponse) => {
                 return cachedResponse || fetch(event.request).then((networkResponse) => {
@@ -63,22 +78,6 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-
-// ✅ PWA通知の処理
-self.addEventListener("notificationclick", (event) => {
-    event.notification.close();
-
-    if (event.action === "install") {
-        self.clients.matchAll().then((clients) => {
-            clients.forEach((client) => client.postMessage({ action: "install" }));
-        });
-    } else if (event.action === "dismiss") {
-        self.clients.matchAll().then((clients) => {
-            clients.forEach((client) => client.postMessage({ action: "dismiss" }));
-        });
-    }
-});
-
 // ✅ IndexedDB から履歴を取得する関数
 function getOfflineGachaHistory() {
     return new Promise((resolve, reject) => {
@@ -86,6 +85,11 @@ function getOfflineGachaHistory() {
 
         request.onsuccess = function(event) {
             let db = event.target.result;
+            if (!db.objectStoreNames.contains("history")) {
+                resolve([]); // ✅ ストアが存在しない場合は空データを返す
+                return;
+            }
+
             let transaction = db.transaction(["history"], "readonly");
             let store = transaction.objectStore("history");
             let results = [];
@@ -104,22 +108,27 @@ function getOfflineGachaHistory() {
         request.onerror = function(event) {
             reject("⚠️ IndexedDBの取得エラー: " + event.target.error);
         };
+
+        request.onupgradeneeded = function(event) {
+            let db = event.target.result;
+            if (!db.objectStoreNames.contains("history")) {
+                db.createObjectStore("history", { keyPath: "id", autoIncrement: true });
+            }
+        };
     });
 }
 
-// ✅ `fetch` イベント内でIndexedDBのデータを提供
-self.addEventListener("fetch", (event) => {
-    if (event.request.url.endsWith("/history")) {
-        event.respondWith(
-            getOfflineGachaHistory().then((data) => {
-                return new Response(JSON.stringify(data), {
-                    headers: { "Content-Type": "application/json" }
-                });
-            }).catch(() => {
-                return new Response(JSON.stringify([]), {
-                    headers: { "Content-Type": "application/json" }
-                });
-            })
-        );
+// ✅ PWA通知の処理
+self.addEventListener("notificationclick", (event) => {
+    event.notification.close();
+
+    if (event.action === "install") {
+        self.clients.matchAll().then((clients) => {
+            clients.forEach((client) => client.postMessage({ action: "install" }));
+        });
+    } else if (event.action === "dismiss") {
+        self.clients.matchAll().then((clients) => {
+            clients.forEach((client) => client.postMessage({ action: "dismiss" }));
+        });
     }
 });
