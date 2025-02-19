@@ -1,5 +1,5 @@
 const CACHE_NAME = "gacha-cache-v5"; // ✅ キャッシュ名を更新
-
+const OFFLINE_URL = "/index.html";  // ✅ オフライン時の表示ページ
 const urlsToCache = [
     "/",
     "/index.html",
@@ -28,22 +28,24 @@ self.addEventListener("install", (event) => {
     );
 });
 
-// ✅ オフライン時でもページを開けるようにする
+// ✅ オフライン時に `index.html` を返すよう修正
 self.addEventListener("fetch", (event) => {
-    event.respondWith(
-        caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || fetch(event.request).then((networkResponse) => {
-                return caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
+    if (event.request.mode === "navigate") { // ✅ ページ遷移時の処理
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+        );
+    } else {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request).then((networkResponse) => {
+                    return caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
                 });
-            });
-        }).catch(() => {
-            if (event.request.mode === "navigate") {
-                return caches.match("/index.html"); // ✅ オフライン時に index.html を表示
-            }
-        })
-    );
+            })
+        );
+    }
 });
 
 // ✅ 古いキャッシュを削除
@@ -60,6 +62,7 @@ self.addEventListener("activate", (event) => {
         }).then(() => self.clients.claim()) // ✅ すぐ反映
     );
 });
+
 
 // ✅ PWA通知の処理
 self.addEventListener("notificationclick", (event) => {
