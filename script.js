@@ -386,3 +386,75 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ ページロード時にポップアップをチェック
     showInstallPopup();
 });
+
+// 🎯 IndexedDB の初期化
+function initDatabase() {
+    let request = indexedDB.open("GachaHistoryDB", 1);
+
+    request.onupgradeneeded = function(event) {
+        let db = event.target.result;
+        if (!db.objectStoreNames.contains("history")) {
+            db.createObjectStore("history", { keyPath: "id", autoIncrement: true });
+        }
+    };
+
+    request.onerror = function(event) {
+        console.error("IndexedDBの初期化エラー:", event.target.error);
+    };
+}
+
+// 🎯 IndexedDB にガチャ履歴を保存
+function saveGachaResult(result) {
+    let request = indexedDB.open("GachaHistoryDB", 1);
+
+    request.onsuccess = function(event) {
+        let db = event.target.result;
+        let transaction = db.transaction(["history"], "readwrite");
+        let store = transaction.objectStore("history");
+
+        store.add({ date: new Date(), result });
+
+        transaction.oncomplete = function() {
+            console.log("✅ ガチャ結果がIndexedDBに保存されました");
+        };
+
+        transaction.onerror = function(event) {
+            console.error("⚠️ IndexedDBへの保存エラー:", event.target.error);
+        };
+    };
+
+    request.onerror = function(event) {
+        console.error("⚠️ IndexedDBを開けませんでした:", event.target.error);
+    };
+}
+
+// 🎯 IndexedDB から履歴を取得
+function getGachaHistory(callback) {
+    let request = indexedDB.open("GachaHistoryDB", 1);
+
+    request.onsuccess = function(event) {
+        let db = event.target.result;
+        let transaction = db.transaction(["history"], "readonly");
+        let store = transaction.objectStore("history");
+        let results = [];
+
+        store.openCursor().onsuccess = function(event) {
+            let cursor = event.target.result;
+            if (cursor) {
+                results.push(cursor.value);
+                cursor.continue();
+            } else {
+                callback(results);
+            }
+        };
+    };
+
+    request.onerror = function(event) {
+        console.error("⚠️ IndexedDBの履歴取得エラー:", event.target.error);
+    };
+}
+
+// 🎯 初回実行
+document.addEventListener("DOMContentLoaded", function () {
+    initDatabase();
+});

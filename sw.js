@@ -1,5 +1,4 @@
-const CACHE_NAME = "gacha-cache-v4"; // ✅ キャッシュ名を更新
-const CACHE_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // ✅ 7日間キャッシュ
+const CACHE_NAME = "gacha-cache-v5"; // ✅ キャッシュ名を更新
 
 const urlsToCache = [
     "/",
@@ -14,7 +13,7 @@ const urlsToCache = [
     "/image3.png",
     "/image4.png",
     "/image5.png",
-    "/capsule,192.png",
+    "/capsule192.png",
     "/capsule.png",
     "/sounds/gacha_start.mp3",
     "/sounds/result.mp3"
@@ -29,29 +28,22 @@ self.addEventListener("install", (event) => {
     );
 });
 
-// ✅ オンラインなら最新データ、オフラインならキャッシュを使用
+// ✅ オフライン対応 & 更新処理
 self.addEventListener("fetch", (event) => {
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            if (cachedResponse) {
-                // ✅ キャッシュが古すぎる場合は削除
-                const fetchTime = cachedResponse.headers.get("date");
-                if (fetchTime && (Date.now() - new Date(fetchTime).getTime()) > CACHE_EXPIRATION) {
-                    return fetch(event.request).then((networkResponse) => {
-                        return caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, networkResponse.clone()); // ✅ 最新データを保存
-                            return networkResponse;
-                        });
-                    });
-                }
-                return cachedResponse;
-            }
+            // ✅ キャッシュがある場合はそのまま返す
+            if (cachedResponse) return cachedResponse;
+
             // ✅ オンラインなら最新データを取得
             return fetch(event.request).then((networkResponse) => {
                 return caches.open(CACHE_NAME).then((cache) => {
                     cache.put(event.request, networkResponse.clone()); // ✅ 新しいキャッシュを保存
                     return networkResponse;
                 });
+            }).catch(() => {
+                // ✅ オフラインでキャッシュがない場合、デフォルトのオフラインページを返す
+                return caches.match("/offline.html");
             });
         })
     );
@@ -72,6 +64,7 @@ self.addEventListener("activate", (event) => {
     );
 });
 
+// ✅ PWA通知の処理
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
 
@@ -83,5 +76,50 @@ self.addEventListener("notificationclick", (event) => {
         self.clients.matchAll().then((clients) => {
             clients.forEach((client) => client.postMessage({ action: "dismiss" }));
         });
+    }
+});
+
+// ✅ IndexedDB から履歴を取得する関数
+function getOfflineGachaHistory() {
+    return new Promise((resolve, reject) => {
+        let request = indexedDB.open("GachaHistoryDB", 1);
+
+        request.onsuccess = function(event) {
+            let db = event.target.result;
+            let transaction = db.transaction(["history"], "readonly");
+            let store = transaction.objectStore("history");
+            let results = [];
+
+            store.openCursor().onsuccess = function(event) {
+                let cursor = event.target.result;
+                if (cursor) {
+                    results.push(cursor.value);
+                    cursor.continue();
+                } else {
+                    resolve(results);
+                }
+            };
+        };
+
+        request.onerror = function(event) {
+            reject("⚠️ IndexedDBの取得エラー: " + event.target.error);
+        };
+    });
+}
+
+// ✅ `fetch` イベント内でIndexedDBのデータを提供
+self.addEventListener("fetch", (event) => {
+    if (event.request.url.endsWith("/history")) {
+        event.respondWith(
+            getOfflineGachaHistory().then((data) => {
+                return new Response(JSON.stringify(data), {
+                    headers: { "Content-Type": "application/json" }
+                });
+            }).catch(() => {
+                return new Response(JSON.stringify([]), {
+                    headers: { "Content-Type": "application/json" }
+                });
+            })
+        );
     }
 });
