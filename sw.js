@@ -43,7 +43,7 @@ self.addEventListener("fetch", (event) => {
                 });
             }).catch(() => {
                 // ✅ オフラインでキャッシュがない場合、デフォルトのオフラインページを返す
-                return caches.match("/offline.html");
+                return caches.match("/index.html");
             });
         })
     );
