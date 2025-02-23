@@ -94,13 +94,9 @@ function stopGachaAnimation() {
 }
 
 // 🎯 ガチャを引く
-function pullGacha() {
-    const playerName = document.getElementById("player-name").value.trim();
-    const count = parseInt(document.getElementById("gacha-count").value, 10);
-    const resultPanel = document.getElementById("gacha-result-panel");
-    const resultText = document.getElementById("result-text");
-    const resultImage = document.getElementById("result-image");
-    const playerNameDisplay = document.getElementById("player-name-display");
+async function pullGacha() {
+    const playerName = document.getElementById("player-name")?.value.trim();
+    const count = parseInt(document.getElementById("gacha-count")?.value, 10);
 
     if (!playerName) {
         alert("リスナー名を入力してください");
@@ -109,64 +105,39 @@ function pullGacha() {
 
     let items = JSON.parse(localStorage.getItem("items")) || [];
     if (items.length === 0) {
-        alert("景品リストがありません。景品を追加してください。");
+        alert("景品リストがありません。");
         return;
     }
 
-    const totalRate = items.reduce((sum, item) => sum + item.rate, 0);
-    if (totalRate !== 100) {
-        alert(`景品の確率合計が100%ではありません（現在: ${totalRate.toFixed(2)}％）。`);
-        return;
-    }
-
-    playSound("start");
-    startGachaAnimation();
-
-    let results = {};
+    // 🎯 確率計算のための累積配列を作成
     let probabilityTable = [];
+    let cumulativeProbability = 0;
 
     items.forEach(item => {
-        for (let i = 0; i < item.rate * 100; i++) {
-            probabilityTable.push(item.name);
-        }
+        cumulativeProbability += item.rate;
+        probabilityTable.push({ name: item.name, cumulative: cumulativeProbability });
     });
 
+    let results = {};
+
     for (let i = 0; i < count; i++) {
-        let selectedItem = probabilityTable[Math.floor(Math.random() * probabilityTable.length)];
+        let rand = Math.random() * cumulativeProbability; // 0 から合計確率までの乱数を生成
+        let selectedItem = items[0].name; // 初期値（エラー防止）
+
+        for (let j = 0; j < probabilityTable.length; j++) {
+            if (rand < probabilityTable[j].cumulative) {
+                selectedItem = probabilityTable[j].name;
+                break;
+            }
+        }
+
         results[selectedItem] = (results[selectedItem] || 0) + 1;
     }
 
-    setTimeout(() => {
-        stopGachaAnimation();
-        playSound("result");
-
-        resultPanel.style.display = "block";
-        resultText.innerHTML = "";
-        Object.entries(results).forEach(([item, num]) => {
-            const listItem = document.createElement("p");
-            listItem.innerText = `${item} × ${num}`;
-            resultText.appendChild(listItem);
-        });
-        playerNameDisplay.innerText = `リスナー名: ${playerName}`;
-        resultImage.src = "images.png"; // 🎯 リザルト画像を追加
-
-        let history = JSON.parse(localStorage.getItem("history")) || [];
-        let existingHistory = history.find(h => h.player === playerName);
-
-        if (existingHistory) {
-            existingHistory.count += count;
-            for (const [itemName, num] of Object.entries(results)) {
-                existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + num;
-            }
-        } else {
-            history.push({ player: playerName, count, results });
-        }
-
-        localStorage.setItem("history", JSON.stringify(history));
-        updateHistory();
-    }, 4800);
+    document.getElementById("result-text").innerHTML = Object.entries(results)
+        .map(([item, num]) => `<p>${item} × ${num}</p>`).join("");
+    document.getElementById("player-name-display").innerText = `リスナー名: ${playerName}`;
 }
-
 // 🎯 結果パネルを閉じる
 function closeResultPanel() {
     document.getElementById("gacha-result-panel").style.display = "none";
@@ -318,9 +289,29 @@ function requestNotificationPermission() {
     }
 }
 
-// 🎯 Service Worker の登録
+// 🎯 Service Worker の登録 & 自動更新
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js")
-    .then(() => console.log("✅ Service Worker が登録されました"))
-    .catch(error => console.error("❌ Service Worker の登録に失敗しました:", error));
+    navigator.serviceWorker.register("sw.js").then(registration => {
+        console.log("✅ Service Worker が登録されました");
+
+        // 🎯 新しいバージョンがある場合、すぐ適用
+        if (registration.waiting) {
+            registration.waiting.postMessage("skipWaiting");
+        }
+
+        registration.addEventListener("updatefound", () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener("statechange", () => {
+                if (newWorker.state === "installed") {
+                    console.log("🔄 新しい Service Worker を適用");
+                    newWorker.postMessage("skipWaiting");
+                }
+            });
+        });
+    }).catch(error => console.error("❌ Service Worker の登録に失敗しました:", error));
+
+    // 🎯 ページをリロードせずに新しい Service Worker を適用
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+        console.log("🔄 ページをリロードせずに新しいバージョンを適用しました");
+    });
 }
