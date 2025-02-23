@@ -1,13 +1,15 @@
-const CACHE_NAME = "gacha-cache-v2";
+const CACHE_NAME = "gacha-cache-v3";
 const urlsToCache = [
     "index.html",
     "history.html",
     "manifest.json",
     "service-worker.js",
     "style.css",
+    "history.css",
     "script.js",
-    "icons/icon-192x192.png",
-    "icons/icon-512x512.png"
+    "history.js",
+    "icon-192x192.png",
+    "icon-512x512.png"
 ];
 
 // 🎯 キャッシュのインストール
@@ -19,16 +21,21 @@ self.addEventListener("install", event => {
     );
 });
 
-// 🎯 オフライン対応
+// 🎯 オフライン対応（キャッシュを使うが、更新があればネットワークから取得）
 self.addEventListener("fetch", event => {
     event.respondWith(
         caches.match(event.request).then(response => {
-            return response || fetch(event.request);
+            return response || fetch(event.request).then(networkResponse => {
+                return caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                });
+            });
         })
     );
 });
 
-// 🎯 古いキャッシュの削除
+// 🎯 古いキャッシュを削除（自己更新）
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
@@ -39,28 +46,13 @@ self.addEventListener("activate", event => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
-// 🎯 PWA のインストールを促すプッシュ通知
-self.addEventListener("push", event => {
-    const options = {
-        body: "📲 ガチャメーカーをインストールしてアプリで楽しもう！",
-        icon: "icons/icon-192x192.png",
-        badge: "icons/icon-192x192.png",
-        actions: [
-            { action: "install", title: "インストール" },
-            { action: "dismiss", title: "後で" }
-        ]
-    };
-    event.waitUntil(self.registration.showNotification("ガチャメーカー", options));
-});
-
-// 🎯 プッシュ通知のクリック処理
-self.addEventListener("notificationclick", event => {
-    event.notification.close();
-    if (event.action === "install") {
-        clients.openWindow("index.html");
+// 🎯 サービスワーカーの更新を即時反映
+self.addEventListener("message", event => {
+    if (event.data === "skipWaiting") {
+        self.skipWaiting();
     }
 });
