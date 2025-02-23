@@ -1,24 +1,3 @@
-function adjustLayout() {
-    let width = window.innerWidth;
-
-    if (width >= 1025) { // PC
-        document.body.style.zoom = "2.5";
-    } else if (width >= 768) { // タブレット
-        document.body.style.zoom = "4.5";
-    } else { // スマホ
-        document.body.style.zoom = "1";
-    }
-}
-
-window.onresize = adjustLayout;
-document.addEventListener("DOMContentLoaded", function () {
-    const img = new Image();
-    img.src = "back.PNG";
-    img.onload = function () {
-        document.body.style.backgroundImage = `url('${img.src}')`;
-    };
-});
-
 // 🎯 ミュート状態の保存＆取得
 let isMuted = JSON.parse(localStorage.getItem("isMuted")) || false;
 let volume = 1.0; // 音量（0.0～1.0）
@@ -115,36 +94,10 @@ function stopGachaAnimation() {
 }
 
 // 🎯 ガチャを引く
-// 🎯 結果パネルを開くときにスクロールを禁止する
-function showResultPanel() {
-    const resultPanel = document.getElementById("gacha-result-panel");
-    if (resultPanel) {
-        resultPanel.style.display = "block";
-        document.body.style.overflow = "hidden"; // スクロールを禁止
-    }
-}
-
-// 🎯 結果パネルを閉じるときにスクロールを元に戻す
-function closeResultPanel() {
-    const resultPanel = document.getElementById("gacha-result-panel");
-    if (resultPanel) {
-        resultPanel.style.display = "none";
-        document.body.style.overflow = "auto"; // スクロールを元に戻す
-    }
-}
-
-// 🎯 閉じるボタンのイベントリスナー
-document.addEventListener("DOMContentLoaded", function () {
-    const closeButton = document.getElementById("close-button");
-    if (closeButton) {
-        closeButton.addEventListener("click", closeResultPanel);
-    }
-});
-
-// 🎯 ガチャを引く処理を修正
 function pullGacha() {
     const playerName = document.getElementById("player-name").value.trim();
     const count = parseInt(document.getElementById("gacha-count").value, 10);
+    const resultPanel = document.getElementById("gacha-result-panel");
     const resultText = document.getElementById("result-text");
     const resultImage = document.getElementById("result-image");
     const playerNameDisplay = document.getElementById("player-name-display");
@@ -187,38 +140,38 @@ function pullGacha() {
         stopGachaAnimation();
         playSound("result");
 
+        resultPanel.style.display = "block";
         resultText.innerHTML = "";
         Object.entries(results).forEach(([item, num]) => {
             const listItem = document.createElement("p");
             listItem.innerText = `${item} × ${num}`;
             resultText.appendChild(listItem);
         });
-
         playerNameDisplay.innerText = `リスナー名: ${playerName}`;
-        resultImage.src = "images.png"; // 🎯 リザルト画像を設定
+        resultImage.src = "images.png"; // 🎯 リザルト画像を追加
 
-        showResultPanel(); // 🎯 結果パネルを表示＆スクロール禁止
+        let history = JSON.parse(localStorage.getItem("history")) || [];
+        let existingHistory = history.find(h => h.player === playerName);
+
+        if (existingHistory) {
+            existingHistory.count += count;
+            for (const [itemName, num] of Object.entries(results)) {
+                existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + num;
+            }
+        } else {
+            history.push({ player: playerName, count, results });
+        }
+
+        localStorage.setItem("history", JSON.stringify(history));
+        updateHistory();
     }, 4800);
 }
-// 🎯 結果パネルを閉じる
 
+// 🎯 結果パネルを閉じる
 function closeResultPanel() {
     document.getElementById("gacha-result-panel").style.display = "none";
-    document.body.style.overflow = ""; // 🎯 スクロールを元に戻す
 }
 
-// 🎯 結果パネルを開く処理に追加
-document.addEventListener("DOMContentLoaded", function () {
-    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
-    gachaButton.addEventListener("click", function () {
-        openResultPanel();
-    });
-
-    const closeButton = document.getElementById("close-button");
-    closeButton.addEventListener("click", function () {
-        closeResultPanel();
-    });
-});
 // 🎯 景品リストの管理
 function addItem() {
     let name = document.getElementById("item-name").value.trim();
@@ -319,142 +272,55 @@ document.addEventListener("DOMContentLoaded", function () {
     new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
 });
 
-    // ✅ ガチャの誤タップ防止
-    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
-    gachaButton.addEventListener("click", function () {
-        gachaButton.disabled = true; // 押せなくする
-        setTimeout(() => {
-            gachaButton.disabled = false;
-        }, 5000); // 5秒後に再度押せる
-    });
+let deferredPrompt;
 
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-        for (let registration of registrations) {
-            registration.unregister(); // ✅ 古い Service Worker を削除
-        }
-    });
+// 🎯 PWA インストールを促す処理
+window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    deferredPrompt = event;
+    document.getElementById("notify-button").style.display = "block";
+});
+
+document.getElementById("notify-button").addEventListener("click", () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choiceResult => {
+            if (choiceResult.outcome === "accepted") {
+                console.log("✅ PWA がインストールされました");
+            } else {
+                console.log("❌ PWA のインストールがキャンセルされました");
+            }
+            deferredPrompt = null;
+            document.getElementById("notify-button").style.display = "none";
+        });
+    }
+});
+
+// 🎯 PWA インストール済みの場合、通知を非表示
+window.addEventListener("appinstalled", () => {
+    console.log("✅ PWA がインストールされました");
+    document.getElementById("notify-button").style.display = "none";
+});
+
+// 🎯 プッシュ通知の許可リクエスト
+function requestNotificationPermission() {
+    if ("Notification" in window && navigator.serviceWorker) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification("📲 PWA インストールのお知らせ", {
+                        body: "ガチャメーカーをインストールしてアプリで楽しもう！",
+                        icon: "icons/icon-192x192.png"
+                    });
+                });
+            }
+        });
+    }
 }
 
+// 🎯 Service Worker の登録
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js")
-        .then((registration) => {
-            console.log("✅ Service Worker Registered", registration);
-        })
-        .catch((error) => {
-            console.error("❌ Service Worker Registration Failed", error);
-        });
+    .then(() => console.log("✅ Service Worker が登録されました"))
+    .catch(error => console.error("❌ Service Worker の登録に失敗しました:", error));
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-    const installPopup = document.getElementById("install-popup");
-    const installBtn = document.getElementById("install-btn");
-    const laterBtn = document.getElementById("later-btn");
-
-    // ✅ PWAがインストール済みかを判定する関数
-    function isPWAInstalled() {
-        return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || localStorage.getItem("pwaInstalled") === "true");
-    }
-
-    // ✅ 1日後に再表示するためのチェック
-    function shouldShowPopup() {
-        const lastDismissTime = localStorage.getItem("lastDismissTime");
-        if (!lastDismissTime) return true; // 初回訪問時は表示
-        const oneDayLater = parseInt(lastDismissTime) + (24 * 60 * 60 * 1000); // 1日後のタイムスタンプ
-        return Date.now() > oneDayLater; // 1日経過していれば表示
-    }
-
-    // ✅ ポップアップを表示
-    function showInstallPopup() {
-        if (!isPWAInstalled() && shouldShowPopup()) {
-            installPopup.style.display = "block";
-        }
-    }
-
-    // ✅ 「インストール」ボタンを押した場合
-    installBtn.addEventListener("click", () => {
-        localStorage.setItem("pwaInstalled", "true"); // PWAインストール済みを記録
-        installPopup.style.display = "none";
-    });
-
-    // ✅ 「あとで」ボタンを押した場合
-    laterBtn.addEventListener("click", () => {
-        localStorage.setItem("lastDismissTime", Date.now().toString()); // 現在の時間を記録
-        installPopup.style.display = "none";
-    });
-
-    // ✅ ページロード時にポップアップをチェック
-    showInstallPopup();
-});
-
-// 🎯 IndexedDB の初期化
-function initDatabase() {
-    let request = indexedDB.open("GachaHistoryDB", 1);
-
-    request.onupgradeneeded = function(event) {
-        let db = event.target.result;
-        if (!db.objectStoreNames.contains("history")) {
-            db.createObjectStore("history", { keyPath: "id", autoIncrement: true });
-        }
-    };
-
-    request.onerror = function(event) {
-        console.error("IndexedDBの初期化エラー:", event.target.error);
-    };
-}
-
-// 🎯 IndexedDB にガチャ履歴を保存
-function saveGachaResult(result) {
-    let request = indexedDB.open("GachaHistoryDB", 1);
-
-    request.onsuccess = function(event) {
-        let db = event.target.result;
-        let transaction = db.transaction(["history"], "readwrite");
-        let store = transaction.objectStore("history");
-
-        store.add({ date: new Date(), result });
-
-        transaction.oncomplete = function() {
-            console.log("✅ ガチャ結果がIndexedDBに保存されました");
-        };
-
-        transaction.onerror = function(event) {
-            console.error("⚠️ IndexedDBへの保存エラー:", event.target.error);
-        };
-    };
-
-    request.onerror = function(event) {
-        console.error("⚠️ IndexedDBを開けませんでした:", event.target.error);
-    };
-}
-
-// 🎯 IndexedDB から履歴を取得
-function getGachaHistory(callback) {
-    let request = indexedDB.open("GachaHistoryDB", 1);
-
-    request.onsuccess = function(event) {
-        let db = event.target.result;
-        let transaction = db.transaction(["history"], "readonly");
-        let store = transaction.objectStore("history");
-        let results = [];
-
-        store.openCursor().onsuccess = function(event) {
-            let cursor = event.target.result;
-            if (cursor) {
-                results.push(cursor.value);
-                cursor.continue();
-            } else {
-                callback(results);
-            }
-        };
-    };
-
-    request.onerror = function(event) {
-        console.error("⚠️ IndexedDBの履歴取得エラー:", event.target.error);
-    };
-}
-
-// 🎯 初回実行
-document.addEventListener("DOMContentLoaded", function () {
-    initDatabase();
-});
