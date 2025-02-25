@@ -68,32 +68,19 @@ function updateHistory() {
         return;
     }
 
-    let mergedHistory = {};
-
     history.forEach(h => {
-        if (!mergedHistory[h.player]) {
-            mergedHistory[h.player] = { count: 0, results: {} };
-        }
-        mergedHistory[h.player].count += h.count;
-
-        Object.entries(h.results).forEach(([item, count]) => {
-            mergedHistory[h.player].results[item] = (mergedHistory[h.player].results[item] || 0) + count;
-        });
-    });
-
-    Object.entries(mergedHistory).forEach(([player, data]) => {
         const historyTile = document.createElement("div");
         historyTile.classList.add("history-tile");
 
         const listenerName = document.createElement("div");
         listenerName.classList.add("history-header");
-        listenerName.textContent = `🔔 ${player} (合計: ${data.count}回)`;
+        listenerName.textContent = `🔔 ${h.player} (合計: ${h.count}回)`;
         historyTile.appendChild(listenerName);
 
         const itemList = document.createElement("div");
         itemList.classList.add("history-item-list");
 
-        Object.entries(data.results).forEach(([item, count]) => {
+        Object.entries(h.results).forEach(([item, count]) => {
             const itemDiv = document.createElement("div");
             itemDiv.classList.add("history-item");
 
@@ -113,8 +100,6 @@ function updateHistory() {
         historyContainer.appendChild(historyTile);
     });
 }
-    updateHistory(); // 初回ロード時に履歴を更新
-
     // 🎯 履歴をクリア
     const clearHistoryButton = document.getElementById("clear-history-button");
     if (clearHistoryButton) {

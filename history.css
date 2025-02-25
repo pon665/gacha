@@ -126,10 +126,10 @@ table th {
     margin-bottom: 10px;
 }
 
-/* 🎀 景品リストのデザイン */
+/* 🎀 履歴の景品リスト */
 .history-item-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* 自動調整 */
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* 画面幅に応じて列数を調整 */
     gap: 10px;
     border-top: 2px solid #ff80ab;
     padding-top: 10px;
@@ -138,16 +138,12 @@ table th {
 
 /* 🎀 景品カード */
 .history-item {
-    background: linear-gradient(135deg, #ffccd5, #ffe6ea);
+    background: #ffccd5;
     padding: 10px;
     border-radius: 10px;
     font-weight: bold;
     font-size: 1rem;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     box-shadow: 2px 2px 5px rgba(255, 64, 129, 0.2);
     transition: transform 0.2s ease-in-out;
 }
@@ -156,6 +152,8 @@ table th {
 .history-item:hover {
     transform: scale(1.05);
 }
+
+
 
 /* 🎀 景品名 */
 .history-item span {
