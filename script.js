@@ -1,3 +1,39 @@
+function adjustLayout() {
+    const width = window.innerWidth;
+    const container = document.querySelector(".container");
+    const gachaMachine = document.querySelector(".gacha-machine img");
+    const resultPanel = document.getElementById("gacha-result-panel");
+
+    if (!container || !gachaMachine || !resultPanel) return;
+
+    // 共通のスタイル設定（中央寄せ）
+    container.style.margin = "0 auto";
+    container.style.textAlign = "center";
+    
+    resultPanel.style.margin = "0 auto";
+
+    if (width <= 480) {
+        // 🎯 スマホ向け
+        container.style.width = "95%";
+        gachaMachine.style.width = "100%";
+        resultPanel.style.width = "90%";
+    } else if (width <= 1024) {
+        // 🎯 タブレット向け
+        container.style.width = "85%";
+        gachaMachine.style.width = "80%";
+        resultPanel.style.width = "80%";
+    } else {
+        // 🎯 PC向け
+        container.style.width = "60%";
+        gachaMachine.style.width = "60%";
+        resultPanel.style.width = "50%";
+    }
+}
+
+// 🎯 初回ロード時 & 画面サイズ変更時にレイアウトを調整
+window.addEventListener("DOMContentLoaded", adjustLayout);
+window.addEventListener("resize", adjustLayout);
+
 // 🎯 ミュート状態の保存＆取得
 let isMuted = JSON.parse(localStorage.getItem("isMuted")) || false;
 let volume = 1.0; // 音量（0.0～1.0）
@@ -94,54 +130,120 @@ function stopGachaAnimation() {
 }
 
 // 🎯 ガチャを引く
-async function pullGacha() {
-    const playerName = document.getElementById("player-name")?.value.trim();
-    const count = parseInt(document.getElementById("gacha-count")?.value, 10);
+function pullGacha() {
+    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
+    if (!gachaButton) return;
+
+    // ボタンを無効化
+    gachaButton.disabled = true;
+
+    const playerName = document.getElementById("player-name").value.trim();
+    const count = parseInt(document.getElementById("gacha-count").value, 10);
+    const resultPanel = document.getElementById("gacha-result-panel");
+    const resultText = document.getElementById("result-text");
+    const resultImage = document.getElementById("result-image");
+    const playerNameDisplay = document.getElementById("player-name-display");
 
     if (!playerName) {
         alert("リスナー名を入力してください");
+        gachaButton.disabled = false;
         return;
     }
 
     let items = JSON.parse(localStorage.getItem("items")) || [];
     if (items.length === 0) {
-        alert("景品リストがありません。");
+        alert("景品リストがありません。景品を追加してください。");
+        gachaButton.disabled = false;
         return;
     }
 
-    // 🎯 確率計算のための累積配列を作成
-    let probabilityTable = [];
-    let cumulativeProbability = 0;
+    const totalRate = items.reduce((sum, item) => sum + item.rate, 0);
+    if (totalRate !== 100) {
+        alert(`景品の確率合計が100%ではありません（現在: ${totalRate.toFixed(2)}％）。`);
+        gachaButton.disabled = false;
+        return;
+    }
 
-    items.forEach(item => {
-        cumulativeProbability += item.rate;
-        probabilityTable.push({ name: item.name, cumulative: cumulativeProbability });
-    });
+    playSound("start");
+    startGachaAnimation();
 
     let results = {};
+    let probabilityTable = [];
+
+    items.forEach(item => {
+        for (let i = 0; i < item.rate * 100; i++) {
+            probabilityTable.push(item.name);
+        }
+    });
 
     for (let i = 0; i < count; i++) {
-        let rand = Math.random() * cumulativeProbability; // 0 から合計確率までの乱数を生成
-        let selectedItem = items[0].name; // 初期値（エラー防止）
-
-        for (let j = 0; j < probabilityTable.length; j++) {
-            if (rand < probabilityTable[j].cumulative) {
-                selectedItem = probabilityTable[j].name;
-                break;
-            }
-        }
-
+        let selectedItem = probabilityTable[Math.floor(Math.random() * probabilityTable.length)];
         results[selectedItem] = (results[selectedItem] || 0) + 1;
     }
 
-    document.getElementById("result-text").innerHTML = Object.entries(results)
-        .map(([item, num]) => `<p>${item} × ${num}</p>`).join("");
-    document.getElementById("player-name-display").innerText = `リスナー名: ${playerName}`;
+    setTimeout(() => {
+        stopGachaAnimation();
+        playSound("result");
+
+        resultPanel.style.display = "block";
+        resultText.innerHTML = "";
+        Object.entries(results).forEach(([item, num]) => {
+            const listItem = document.createElement("p");
+            listItem.innerText = `${item} × ${num}`;
+            resultText.appendChild(listItem);
+        });
+        playerNameDisplay.innerText = `リスナー名: ${playerName}`;
+        resultImage.src = "images.png"; // 🎯 リザルト画像を追加
+
+        let history = JSON.parse(localStorage.getItem("history")) || [];
+        let existingHistory = history.find(h => h.player === playerName);
+
+        if (existingHistory) {
+            existingHistory.count += count;
+            for (const [itemName, num] of Object.entries(results)) {
+                existingHistory.results[itemName] = (existingHistory.results[itemName] || 0) + num;
+            }
+        } else {
+            history.push({ player: playerName, count, results });
+        }
+
+        localStorage.setItem("history", JSON.stringify(history));
+        updateHistory();
+    }, 4800);
 }
-// 🎯 結果パネルを閉じる
+
+// 🎯 結果パネルを閉じる（ガチャボタンを有効化＆リスナー名をクリア）
 function closeResultPanel() {
     document.getElementById("gacha-result-panel").style.display = "none";
+
+    // 🎯 ガチャボタンを再度有効化
+    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
+    if (gachaButton) {
+        gachaButton.disabled = false;
+    }
+
+    // 🎯 リスナー名をクリア
+    document.getElementById("player-name").value = "";
 }
+
+// 🎯 閉じるボタンの処理を修正（閉じる際にボタンを有効化＆リスナー名をクリア）
+document.addEventListener("DOMContentLoaded", function () {
+    const closeButton = document.getElementById("close-button");
+    if (closeButton) {
+        closeButton.addEventListener("click", function () {
+            closeResultPanel();
+        });
+    }
+});
+// 🎯 閉じるボタンの処理を修正（閉じる際にボタンを有効化）
+document.addEventListener("DOMContentLoaded", function () {
+    const closeButton = document.getElementById("close-button");
+    if (closeButton) {
+        closeButton.addEventListener("click", function () {
+            closeResultPanel();
+        });
+    }
+});
 
 // 🎯 景品リストの管理
 function addItem() {
@@ -243,75 +345,67 @@ document.addEventListener("DOMContentLoaded", function () {
     new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
 });
 
+// 🎯 Service Worker の登録
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+        .then((registration) => {
+            console.log("✅ Service Worker Registered:", registration);
+        })
+        .catch((error) => {
+            console.error("❌ Service Worker Registration Failed:", error);
+        });
+}
+
+// 🎯 インストールを促すプッシュ通知
 let deferredPrompt;
 
-// 🎯 PWA インストールを促す処理
-window.addEventListener("beforeinstallprompt", event => {
+window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredPrompt = event;
-    document.getElementById("notify-button").style.display = "block";
+
+    // 3秒後にインストールの案内を表示
+    setTimeout(() => {
+        showInstallNotification();
+    }, 3000);
 });
 
-document.getElementById("notify-button").addEventListener("click", () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choiceResult => {
-            if (choiceResult.outcome === "accepted") {
-                console.log("✅ PWA がインストールされました");
-            } else {
-                console.log("❌ PWA のインストールがキャンセルされました");
-            }
-            deferredPrompt = null;
-            document.getElementById("notify-button").style.display = "none";
-        });
-    }
-});
-
-// 🎯 PWA インストール済みの場合、通知を非表示
-window.addEventListener("appinstalled", () => {
-    console.log("✅ PWA がインストールされました");
-    document.getElementById("notify-button").style.display = "none";
-});
-
-// 🎯 プッシュ通知の許可リクエスト
-function requestNotificationPermission() {
-    if ("Notification" in window && navigator.serviceWorker) {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification("📲 PWA インストールのお知らせ", {
-                        body: "ガチャメーカーをインストールしてアプリで楽しもう！",
-                        icon: "icons/icon-192x192.png"
-                    });
-                });
-            }
-        });
-    }
-}
-
-// 🎯 Service Worker の登録 & 自動更新
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").then(registration => {
-        console.log("✅ Service Worker が登録されました");
-
-        // 🎯 新しいバージョンがある場合、すぐ適用
-        if (registration.waiting) {
-            registration.waiting.postMessage("skipWaiting");
-        }
-
-        registration.addEventListener("updatefound", () => {
-            const newWorker = registration.installing;
-            newWorker.addEventListener("statechange", () => {
-                if (newWorker.state === "installed") {
-                    console.log("🔄 新しい Service Worker を適用");
-                    newWorker.postMessage("skipWaiting");
+function showInstallNotification() {
+    if (Notification.permission === "granted") {
+        new Notification("ガチャメーカー", {
+            body: "アプリをインストールすると、すぐにガチャを回せるようになります！",
+            icon: "icon-192.png"
+        }).onclick = () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === "accepted") {
+                    console.log("✅ PWA Installed");
                 }
             });
+        };
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                showInstallNotification();
+            }
         });
-    }).catch(error => console.error("❌ Service Worker の登録に失敗しました:", error));
-
-    // 🎯 ページをリロードせずに新しい Service Worker を適用
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-        console.log("🔄 ページをリロードせずに新しいバージョンを適用しました");
-    });
+    }
 }
+
+// 🎯 手動でプッシュ通知を送る
+function sendPushNotification() {
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.showNotification("ガチャメーカー", {
+                body: "アプリをインストールすると、すぐにガチャを回せるようになります！",
+                icon: "icon-192.png",
+                vibrate: [200, 100, 200],
+                actions: [
+                    { action: "install", title: "インストールする" }
+                ]
+            });
+        });
+    }
+}
+
+// 10秒後にインストールを促すプッシュ通知を送信
+setTimeout(sendPushNotification, 10000);

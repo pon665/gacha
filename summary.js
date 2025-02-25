@@ -1,3 +1,38 @@
+function adjustLayout() {
+    const width = window.innerWidth;
+    const container = document.querySelector(".container");
+    const gachaMachine = document.querySelector(".gacha-machine img");
+    const resultPanel = document.getElementById("gacha-result-panel");
+
+    if (!container || !gachaMachine || !resultPanel) return;
+
+    // 共通のスタイル設定（中央寄せ）
+    container.style.margin = "0 auto";
+    container.style.textAlign = "center";
+    
+    resultPanel.style.margin = "0 auto";
+
+    if (width <= 480) {
+        // 🎯 スマホ向け
+        container.style.width = "95%";
+        gachaMachine.style.width = "100%";
+        resultPanel.style.width = "90%";
+    } else if (width <= 1024) {
+        // 🎯 タブレット向け
+        container.style.width = "85%";
+        gachaMachine.style.width = "80%";
+        resultPanel.style.width = "80%";
+    } else {
+        // 🎯 PC向け
+        container.style.width = "60%";
+        gachaMachine.style.width = "60%";
+        resultPanel.style.width = "50%";
+    }
+}
+
+// 🎯 初回ロード時 & 画面サイズ変更時にレイアウトを調整
+window.addEventListener("DOMContentLoaded", adjustLayout);
+window.addEventListener("resize", adjustLayout);
 document.addEventListener("DOMContentLoaded", function () {
     // 🎯 ハンバーガーメニューの開閉処理
     const menuButton = document.querySelector(".hamburger-menu");

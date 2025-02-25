@@ -2,22 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ガチャメーカー</title>
-  <!-- PWA用の設定 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff80ab">
-    
-    <!-- iOS用の設定 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ガチャメーカー">
-    <link rel="apple-touch-icon" href="capsule,192.png">
   <link rel="stylesheet" href="styles.css">
-    <link rel="preload" href="back.PNG" as="image">
+ <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffcc00">
 </head>
 <body>
-  <div class="back.png">
   <!-- メニューバー -->
   <div class="navbar">
   <button id="mute-button" onclick="toggleMute()">ミュート</button>
@@ -74,10 +65,15 @@
     <!-- 閉じるボタン -->
     <button id="close-button" class="close-button">閉じる</button>
 </div>
-</div>
-<div id="install-popup" class="popup">
-<button id="notify-button">📢 インストール通知を受け取る</button></div>
-</div>
-  <script src="script.js"></script>
+
+  <script src="script.js">
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js").then(() => {
+      console.log("Service Worker Registered");
+    });
+  }
+</script>
+  </script>
 </body>
 </html>

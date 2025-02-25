@@ -126,24 +126,53 @@ table th {
     margin-bottom: 10px;
 }
 
-/* 🎀 景品リスト（2列グリッド） */
+/* 🎀 景品リストのデザイン */
 .history-item-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 📌 2列表示 */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* 自動調整 */
     gap: 10px;
-    border-top: 1px solid #ff80ab;
+    border-top: 2px solid #ff80ab;
     padding-top: 10px;
+    justify-content: center;
 }
 
-/* 🎀 景品バッジ */
+/* 🎀 景品カード */
 .history-item {
-    background: #ffccd5;
-    padding: 5px 10px;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #ffccd5, #ffe6ea);
+    padding: 10px;
+    border-radius: 10px;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 1rem;
     text-align: center;
-    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px rgba(255, 64, 129, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* 🎀 ホバーエフェクト */
+.history-item:hover {
+    transform: scale(1.05);
+}
+
+/* 🎀 景品名 */
+.history-item span {
+    display: block;
+    font-size: 0.9rem;
+}
+
+/* 🎀 景品の数量を目立たせる */
+.history-item .count {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ff4081;
+    background: #fff;
+    padding: 3px 8px;
+    border-radius: 5px;
+    margin-top: 5px;
+    box-shadow: 1px 1px 3px rgba(255, 64, 129, 0.3);
 }
 
 

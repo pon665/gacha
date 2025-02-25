@@ -1,38 +1,11 @@
-html {
-    background: url('back.PNG') no-repeat center center fixed;
-    background-size: cover;
-}
 /* 🎀 かわいいフォントを適用 */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Mochiy+Pop+One&display=swap');
 
 body {
     font-family: 'Fredoka One', sans-serif;
-    width: 100%;
-    height: 10px;
-    margin: 0px ;
-    padding: 0;
-    background-image: url(back.PNG);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    background-attachment: fixed;
-    display: flex;
-    flex-direction:column;
-    align-items: center;
-    justify-content: space-between;
+    background: linear-gradient(180deg, #ffe6ea, #fff5f8);
     color: #ff4081;
     text-align: center;
-}
-/* 🎀 背景画像の上に半透明のレイヤーを追加 */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.6); /* 白色の半透明 */
-    z-index: -2; /* 背景より後ろに配置 */
 }
 
 /* 🎀 メニューバー */
@@ -41,10 +14,8 @@ body::before {
     border-bottom: 3px solid #ff80ab;
     padding: 12px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
-    width: 100%;
-    max-width: 1200px;
     border-radius: 0 0 10px 10px;
 }
 
@@ -71,44 +42,28 @@ body::before {
 }
 /* 🎀 コンテンツ全体 */
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width:95%;
-  height:80vh;
-    max-width: 1400px;
+    max-width: 800px;
     margin: 20px auto;
-    text-align: center;
-    padding: 25px;
+    padding: 20px;
     background: #fff;
     border: 3px solid #ff80ab;
     border-radius: 20px;
     box-shadow: 0 5px 20px rgba(255, 64, 129, 0.3);
-    gap: 20px;
 }
 
 /* 🎀 タイトル */
 h1 {
     font-family: 'Mochiy Pop One', sans-serif;
-    font-size: 2.1rem;
+    font-size: 2.5rem;
     color: #ff6ec7;
     text-shadow: 3px 3px 0px #ffd1dc, 6px 6px 0px #ff80ab;
     letter-spacing: 2px;
     margin-bottom: 20px;
-    white-space: noworp;
-    display: blok;
-    max-width: 95%;
 }
 
 /* 🎀 フォーム */
 input[type="text"], input[type="number"] {
-    width: 100%;
-    max-width: 1000px ;
-    max-height:250px;
-    margin-bottom: 250px;
-    margin: 0 auto;
-    display: block;
+    width: 90%;
     padding: 12px;
     border: 2px solid #ff80ab;
     border-radius: 15px;
@@ -116,14 +71,11 @@ input[type="text"], input[type="number"] {
     background: #fff;
     color: #ff4081;
     text-align: center;
-    overflow-y: auto;
     box-shadow: inset 0 2px 5px rgba(255, 64, 129, 0.2);
 }
 
 /* 🎀 ボタン */
 button {
-  display: block;
-  margin: 10px auto;
     font-family: 'Fredoka One', sans-serif;
     font-size: 1.3rem;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
@@ -143,7 +95,7 @@ button:hover {
 
 /* 🎀 ガチャマシン */
 .gacha-machine {
-    width: 240px;
+    width: 220px;
     margin: 20px auto;
     padding: 10px;
     background: #fff;
@@ -157,7 +109,7 @@ button:hover {
 
 /* 🎀 カプセルアニメーション */
 #gacha-frame {
-    width: 90%;
+    width: 85%;
     transition: opacity 0.2s ease-in-out;
 }
 
@@ -167,10 +119,7 @@ button:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 500px; /* 最大幅を設定 */
-    height: auto;
-    max-height: 85vh; /* 画面の85%を超えないように */
+    width: 320px;
     background: #fff;
     border: 3px solid #ff80ab;
     border-radius: 20px;
@@ -179,47 +128,28 @@ button:hover {
     text-align: center;
     display: none;
     z-index: 1000;
-    overflow: hidden; /* スクロールを禁止 */
-    overflow-y: auto; /* 🎯 縦スクロールを許可 */
-    max-height: 85vh; /* 🎯 画面の85%を超えない */
-    justify-content: space-between;
 }
 
-/* 🎯 bodyのスクロールを防ぐ */
-body.no-scroll {
-    overflow: hidden;
-}
-.result-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-height: calc(85vh - 100px);
-    overflow-y: auto;
-}
 /* 🎀 結果画像 */
 .result-content img {
-    width: 80%;  /* 画像をパネルの80%の幅に */
-    max-width: 250px; /* 画像の最大サイズを制限 */
-    height: auto; /* アスペクト比を保持 */
-    display: block;
-    margin: 0 auto;
+    width: 80%;
+    margin-bottom: 10px;
 }
+
 /* 🎀 結果テキスト */
 .result-overlay {
-    display: flex;
-    flex-wrap: wrap; /* アイテムを折り返し表示 */
-    justify-content: center; /* 中央揃え */
-    gap: 10px; /* アイテム間の余白 */
+    max-height: 300px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2列にする */
+    gap: 5px; /* アイテム間の余白 */
     font-size: 18px;
     font-weight: bold;
     color: #ff4081;
     text-shadow: 1px 1px 5px rgba(255, 64, 129, 0.3);
-    width: 100%;
-    max-width: 400px;
     margin-bottom: 10px;
 }
+
 /* 🎀 プレイヤー名 */
 .player-name-text {
     font-size: 18px;
@@ -230,89 +160,47 @@ body.no-scroll {
 /* ボタンを横並びにする */
 .result-buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     gap: 15px; /* ボタンの間隔 */
     margin-top: 15px;
-    flex-wrap: nowrap;
-    width: 100%;
-    
 }
 
 /* Xのロゴボタンのデザイン */
 .png-icon {
-    background: black;
-    width: 50px;
+   background: #000;
+    display: block; !important
+    width: 50px; /* サイズ調整 */
     height: 50px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
-    margin-left: auto;
 }
+
 /* ホバー時のエフェクト */
 .png-icon:hover {
     transform: scale(1.1);
 }
-.close-button {
-    background: #ff80ab;
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 1rem;
-    text-align: center;
-    width: 100px;
-}
 /* 🎀 景品リストテーブル */
 .item-list {
-    width: 100%;
-    max-width:1000px;
     background: #fff;
     border: 2px solid #ff80ab;
     border-radius: 15px;
     padding: 10px;
     box-shadow: inset 0 2px 5px rgba(255, 64, 129, 0.2);
     margin-bottom: 20px;
-    max-height: 250px;
+    max-height: 200px;
     overflow-y: auto;
 }
 
-.item-row, table td {
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
+.item-row, table th, table td {
     border: 2px solid #ff80ab;
     padding: 10px;
     text-align: left;
-    margin-bottom: 5px;
 }
 
 table th {
     background: #ffd1dc;
     color: #ff4081;
-}
-.item-name {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ff4081;
-    flex-grow: 1; /* 名前が長くなっても幅を調整 */
-    text-align: left;
-}
-.item-delete {
-    background: #ff80ab;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 1rem;
-    text-align: center;
-    white-space: nowrap; /* ボタン内のテキストを折り返さない */
 }
 /* 履歴全体のデザイン */
 .history-table {
@@ -464,121 +352,4 @@ table th {
     color: #ff6ec7;
     margin-top: -10px;
     opacity: 0.8;
-}
-
-@media (max-width: 767px) { /* スマホ */
-    .container {
-        width: 95%;
-        height: 100%;
-        max-width: 100%;
-    }
-    .navbar {
-        width: 95%;
-    }
-    .result-panel {
-        max-width: 600px;
-        max-height: 80vh;
-    }
-    .result-overlay {
-        font-size: 20px;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 1024px) { /* タブレット */
-.body, h1, input, button {
-        font-size: 25px;
-    }
-    h1 {
-        font-size: 2.1rem;
-    }
-    button {
-        font-size: 1.3rem;
-    }
-    .container {
-        width: 100%;
-        height: 100%;
-        max-width: 1200px;
-    }
-    .navbar {
-        width: 94%;
-        .result-panel {
-        max-width: 600px;
-        max-height: 80vh;
-    }
-    .result-overlay {
-        font-size: 20px;
-    }
-    }
-}
-
-@media (min-width: 1025px) { /* PC */
-body, h1, input, button {
-        font-size: 20px;
-    }
-    h1 {
-        font-size: 2.1rem;
-    }
-    button {
-        font-size: 1.5rem;
-    }
-    .container {
-        width: 100%;
-        height: 100%;
-        max-width: 1100px;
-    }
-    .navbar {
-        width: 92%;
-    }
-    .result-panel {
-        max-width: 700px;
-        max-height: 75vh;
-    }
-    .result-overlay {
-        font-size: 22px;
-    }
-}
-
-.popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 400px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    z-index: 1000;
-}
-
-.popup-content h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-.popup-content p {
-    font-size: 16px;
-    margin-bottom: 20px;
-}
-
-.popup button {
-    margin: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-#install-btn {
-    background: #ff4081;
-    color: white;
-}
-
-#later-btn {
-    background: gray;
-    color: white;
 }
