@@ -82,7 +82,9 @@ document.addEventListener("DOMContentLoaded", function () {
     summaryTableBody.innerHTML = "";
 
     let totalCount = 0;
-    Object.entries(aggregate).forEach(([itemName, count]) => {
+    Object.entries(aggregate)
+        .sort(([a], [b]) => a.localeCompare(b, 'ja')) // 🎀 五十音順に並び替え
+   .forEach(([itemName, count]) => {
         totalCount += count;
         const row = document.createElement("tr");
         row.innerHTML = `

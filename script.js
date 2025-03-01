@@ -138,32 +138,82 @@ function stopGachaAnimation() {
     document.getElementById("gacha-frame").src = "image1.png";
 }
 
-// 🎯 結果パネルの表示（画像プリロード & 遅延なし）
-function showResultPanel(results, playerName) {
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ ページ読み込み完了");
+    updateItemList();
+    initSortButtons();
+});
+
+// 🎯 結果パネルの表示
+function showResultPanel(results, playerName, imageSrc) {
+    console.log("🎰 ガチャ結果パネルを表示");
+    
     const resultPanel = document.getElementById("gacha-result-panel");
-    const resultText = document.getElementById("result-text");
-    const resultImage = document.getElementById("result-image");
     const playerNameDisplay = document.getElementById("player-name-display");
+    const resultListContainer = document.getElementById("result-list");
+    const resultImage = document.getElementById("result-image");
+
+    if (!resultPanel || !playerNameDisplay || !resultListContainer || !resultImage) {
+        console.error("❌ 必要な要素が見つかりません");
+        return;
+    }
 
     resultPanel.style.display = "block";
-    resultText.innerHTML = "";
+    document.body.classList.add("modal-open"); // 🎯 背景スクロール無効化
 
-    Object.entries(results).forEach(([item, num]) => {
-        const listItem = document.createElement("p");
-        listItem.innerText = `${item} × ${num}`;
-        resultText.appendChild(listItem);
+    // 🎯 プレイヤー名を表示
+    playerNameDisplay.innerText = `🎉 ${playerName} さんのガチャ結果 🎉`;
+
+    // 🎯 景品リストのクリア
+    resultListContainer.innerHTML = "";
+
+    // 🎯 結果をログ出力（デバッグ用）
+    console.log("📝 受け取ったガチャ結果:", results);
+
+    // 🎯 景品リストを五十音順にソート
+    const sortedResults = Object.entries(results).sort(([a], [b]) => a.localeCompare(b, "ja"));
+
+    // 🎯 2列表示で景品を追加
+    sortedResults.forEach(([item, count]) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.classList.add("result-item");
+        itemDiv.innerHTML = `${item} × ${count}`;
+
+        // 🎯 確率が小数点以下の景品にエフェクトを追加
+        if (count < 1) {
+            itemDiv.classList.add("rare-item");
+            itemDiv.innerHTML += " ✨";
+        }
+
+        resultListContainer.appendChild(itemDiv);
     });
 
-    playerNameDisplay.innerText = `リスナー名: ${playerName}`;
+    // 🎯 画像の表示
+    if (imageSrc) {
+        resultImage.src = imageSrc;
+        resultImage.style.display = "block";
+    } else {
+        resultImage.style.display = "none";
+    }
 
-    // 🎯 画像をプリロードしてから表示
-    const img = new Image();
-    img.src = "images.png";
-    img.onload = () => {
-        resultImage.src = img.src;
-    };
+    // 🎯 スクロール制御（景品が多い時のみスクロール）
+    setTimeout(() => {
+        if (resultListContainer.scrollHeight > resultListContainer.clientHeight) {
+            resultListContainer.style.overflowY = "auto";
+        } else {
+            resultListContainer.style.overflowY = "hidden";
+        }
+    }, 100);
+
+    console.log("✅ ガチャ結果パネルの更新完了");
 }
 
+// 🎯 結果パネルを閉じる
+function closeResultPanel() {
+    console.log("🔄 結果パネルを閉じる");
+    document.getElementById("gacha-result-panel").style.display = "none";
+    document.body.classList.remove("modal-open"); // 🎯 スクロール解除
+}
 // 🎯 ガチャを引く
 function pullGacha() {
     const gachaButton = document.querySelector("button[onclick='pullGacha()']");
@@ -207,32 +257,98 @@ function pullGacha() {
         stopGachaAnimation();
         playSound("result");
         showResultPanel(results, playerName);
+        
+        // 🎯 ガチャボタンを有効化（パネルを閉じる前提で一時的に無効化）
+        setTimeout(() => {
+            gachaButton.disabled = false;
+            console.log("✅ ガチャボタンが有効になりました");
+        }, 500); // 短時間の遅延で確実にボタンが押せるようにする
+        // 🎯 ガチャ結果を履歴に保存（修正）
+        let history = JSON.parse(localStorage.getItem("history")) || [];
+
+        history.push({
+            player: playerName,
+            count: count,
+            results: results,
+            timestamp: new Date().toISOString()
+        });
+
+        localStorage.setItem("history", JSON.stringify(history));
     }, 4800);
 }
-// 🎯 結果パネルを閉じる（ガチャボタンを有効化＆リスナー名をクリア）
+// 🎯 結果パネルを閉じる処理（ガチャボタンを再有効化）
 function closeResultPanel() {
-    document.getElementById("gacha-result-panel").style.display = "none";
+    console.log("🔄 結果パネルを閉じる");
+    const resultPanel = document.getElementById("gacha-result-panel");
 
-    // 🎯 ガチャボタンを再度有効化
-    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
+    if (resultPanel) {
+        resultPanel.style.display = "none";
+    }
+
+    document.body.classList.remove("modal-open"); // 🎯 スクロール解除
+    resetGachaInputs(); // 🎯 入力リセット
+
+    // 🎯 ガチャボタンを確実に再有効化
+ const gachaButton = document.getElementById("gacha-button");
     if (gachaButton) {
         gachaButton.disabled = false;
+        console.log("✅ ガチャボタンが有効になりました");
     }
-
-    // 🎯 リスナー名をクリア
-    document.getElementById("player-name").value = "";
 }
 
-// 🎯 閉じるボタンの処理を修正（閉じる際にボタンを有効化＆リスナー名をクリア）
-document.addEventListener("DOMContentLoaded", function () {
-    const closeButton = document.getElementById("close-button");
-    if (closeButton) {
-        closeButton.addEventListener("click", function () {
-            closeResultPanel();
-        });
+// 🎯 X（Twitter）へ投稿
+function postToX() {
+    const playerNameElement = document.getElementById("player-name-display");
+    const resultList = document.getElementById("result-list");
+
+    if (!playerNameElement || !resultList) {
+        alert("⚠️ リスナー名またはガチャ結果が取得できません。");
+        return;
     }
+
+    const playerName = playerNameElement.innerText.replace("🎉 ", "").replace(" さんのガチャ結果 🎉", "").trim();
+    const results = Array.from(resultList.children)
+        .map(item => item.innerText)
+        .join("\n");
+
+    if (!playerName || !results) {
+        alert("⚠️ ガチャ結果がありません。ガチャを引いてください。");
+        return;
+    }
+
+    const tweetText = encodeURIComponent(`🎉 ${playerName} さんのガチャ結果 🎉\n${results}`);
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+
+    window.open(tweetUrl, "_blank");
+
+    // 🎯 X（Twitter）投稿後のリセット対応
+    setTimeout(() => {
+        resetGachaInputs();
+    }, 500);
+}
+
+// 🎯 ページがアクティブになったときにリセット
+window.addEventListener("focus", function () {
+    console.log("🔄 X（Twitter）投稿後にページがアクティブになったため、ガチャ入力をリセット");
+    resetGachaInputs();
 });
-// 🎯 閉じるボタンの処理を修正（閉じる際にボタンを有効化）
+
+// 🎯 ガチャのリスナー名と回数をリセットする関数
+function resetGachaInputs() {
+    const playerNameInput = document.getElementById("player-name");
+    const gachaCountInput = document.getElementById("gacha-count");
+
+    if (playerNameInput) {
+        playerNameInput.value = "";
+        console.log("📝 リスナー名リセット");
+    }
+    if (gachaCountInput) {
+        gachaCountInput.value = 1;
+        console.log("📝 ガチャ回数リセット（1回に戻す）");
+    }
+}
+
+// 🎯 閉じるボタンの処理を修正（閉じる際にガチャボタンを有効化）
 document.addEventListener("DOMContentLoaded", function () {
     const closeButton = document.getElementById("close-button");
     if (closeButton) {
@@ -406,3 +522,4 @@ function sendPushNotification() {
 
 // 10秒後にインストールを促すプッシュ通知を送信
 setTimeout(sendPushNotification, 10000);
+

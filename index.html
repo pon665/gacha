@@ -50,20 +50,16 @@
       </div>
     </div>
     
-<!-- ガチャ結果のポップアップパネル -->
-<div id="gacha-result-panel" class="result-panel" style="display: none;">
-    <div class="result-content">
-       <p id="player-name-display" class="player-name-text"></p>
-        <img id="result-image" src="" alt="Gacha Result">
-        <div id="result-text" class="result-overlay"></div>
-        </div>
-        <!-- 結果パネルのボタン配置 -->
-<div class="result-buttons">
-    <!-- X（Twitter）投稿ボタン -->
-    <img id="post-x-button" src="logo-white.png" class="png-icon" alt="Xに投稿">
-    
-    <!-- 閉じるボタン -->
-    <button id="close-button" class="close-button">閉じる</button>
+<div id="gacha-result-panel">
+    <h2 id="player-name-display" class="player-name"></h2>
+    <img id="result-image" src="" alt="景品画像">
+    <div id="result-list"></div>
+    <div class="result-buttons">
+        <button id="close-button" onclick="closeResultPanel()">閉じる</button>
+        <button id="post-x-button" onclick="postToX()">
+           <img src="logo-white.png" alt="X 投稿">
+        </button>
+</div>
 </div>
 
   <script src="script.js">

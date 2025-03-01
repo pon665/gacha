@@ -1,12 +1,22 @@
 /* 🎀 かわいいフォントを適用 */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Mochiy+Pop+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop&display=swap');
 
-/* 🎀 全体のデザイン */
 body {
-    font-family: 'Fredoka One', sans-serif;
+    font-family: 'Hachi Maru Pop', cursive;
     background: linear-gradient(180deg, #ffe6ea, #fff5f8);
     color: #ff4081;
     text-align: center;
+        font-weight: bold;
+}
+
+/* 🎀 タイトル */
+h1 {
+    font-family: 'Mochiy Pop One', sans-serif;
+    font-size: 2.5rem;
+    color: #ff6ec7;
+    text-shadow: 3px 3px 0px #ffd1dc, 6px 6px 0px #ff80ab;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
 }
 
 /* 🎀 テーブルコンテナ（スクロール対応） */
@@ -54,7 +64,14 @@ tr:nth-child(even) {
     background: #ffe6ea;
 }
 
-/* 🎀 景品数を強調 */
+/* 🎀 景品名 */
+.item-name {
+    font-size: 1.5rem;
+    color: #ff4081;
+    text-align: center;
+}
+
+/* 🎀 景品数（個数）のデザイン */
 .item-count {
     font-size: 1.4rem;
     font-weight: bold;
@@ -63,44 +80,6 @@ tr:nth-child(even) {
     padding: 5px 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(255, 64, 129, 0.3);
-}
-
-/* 🎀 タイル型リスト（景品） */
-.list-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    max-height: 400px; /* 高さを制限してスクロール */
-    overflow-y: auto;
-    padding: 10px;
-    background: #fff;
-    border-radius: 15px;
-    border: 2px solid #ff80ab;
-    box-shadow: inset 0 3px 10px rgba(255, 64, 129, 0.2);
-}
-
-/* 🎀 タイル型の景品リスト */
-.list-item {
-    width: 150px;
-    padding: 15px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #ff80ab, #ffccd5);
-    color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(255, 64, 129, 0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 🎀 景品名 */
-.item-name {
-    font-size: 1rem;
-    margin-bottom: 5px;
 }
 
 /* 🎀 ハンバーガーメニューのデザイン */
