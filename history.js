@@ -79,7 +79,12 @@ function updateHistory() {
     aggregatedArray.forEach(h => {
         const historyTile = document.createElement("div");
         historyTile.classList.add("history-tile");
-
+        
+   const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.classList.add("history-checkbox");
+        checkbox.dataset.player = h.player;
+        
         const listenerName = document.createElement("div");
         listenerName.classList.add("history-header");
         listenerName.textContent = `🔔 ${h.player} (合計: ${h.count}回)`;
@@ -88,19 +93,67 @@ function updateHistory() {
         const itemList = document.createElement("div");
         itemList.classList.add("history-item-list");
 
-        Object.entries(h.results).forEach(([item, count]) => {
+          const sortedItems = Object.entries(h.results).sort(([a], [b]) => a.localeCompare(b, "ja"));
+
+        sortedItems.forEach(([item, count]) => {
             const itemDiv = document.createElement("div");
             itemDiv.classList.add("history-item");
             itemDiv.textContent = `${item} ×${count}`;
             itemList.appendChild(itemDiv);
         });
 
+        historyTile.appendChild(checkbox);
+        historyTile.appendChild(listenerName);
         historyTile.appendChild(itemList);
         historyContainer.appendChild(historyTile);
     });
 
-    console.log("📌 ガチャ履歴を統合して更新しました。");
+    console.log("📌 ガチャ履歴を統合 & 景品を五十音順で更新しました。");
 }
+// 🎯 スクリーンショット処理
+document.getElementById("screenshot-selected").addEventListener("click", function () {
+    const selectedHistory = document.querySelectorAll(".history-checkbox:checked");
+    if (selectedHistory.length === 0) {
+        alert("📌 保存するリスナーを選択してください。");
+        return;
+    }
+
+    selectedHistory.forEach(checkbox => {
+        const historyTile = checkbox.parentNode;
+        takeScreenshot(historyTile, checkbox.dataset.player);
+    });
+});
+
+document.getElementById("screenshot-all").addEventListener("click", function () {
+    const historyList = document.getElementById("history-list");
+    if (!historyList) {
+        alert("📌 ガチャ履歴が見つかりません。");
+        return;
+    }
+    takeScreenshot(historyList, "gacha_history_all");
+});
+
+// 🎯 スクリーンショット関数
+function takeScreenshot(element, filename) {
+    html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+    }).then(canvas => {
+        const now = new Date();
+        const timestamp = now.toISOString().replace(/[-:.]/g, "");
+        const fileName = `${filename}_${timestamp}.png`;
+
+        let link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = fileName;
+        link.click();
+    }).catch(error => {
+        console.error("スクリーンショットの保存に失敗しました:", error);
+        alert("❌ スクリーンショットの保存に失敗しました。");
+    });
+}
+
 // 🎯 並び替え機能のセットアップ
 function initSortButtons() {
     const sortNewestButton = document.getElementById("sort-newest");
@@ -172,36 +225,6 @@ function initEventListeners() {
         });
     }
 
-    // 🎯 スクリーンショット機能
-    const screenshotButton = document.getElementById("screenshot-button");
-    if (screenshotButton) {
-        screenshotButton.addEventListener("click", function () {
-            const historyList = document.getElementById("history-list");
-            if (!historyList) {
-                alert("📌 ガチャ履歴が見つかりません。");
-                return;
-            }
-
-            html2canvas(historyList, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true
-            }).then(canvas => {
-                const now = new Date();
-                const timestamp = now.toISOString().replace(/[-:.]/g, "");
-                const playerName = prompt("保存するファイル名を入力してください（入力無しも可）") || "gacha_history";
-                const fileName = `${playerName}_${timestamp}.png`;
-
-                let link = document.createElement("a");
-                link.href = canvas.toDataURL("image/png");
-                link.download = fileName;
-                link.click();
-            }).catch(error => {
-                console.error("スクリーンショットの保存に失敗しました:", error);
-                alert("❌ スクリーンショットの保存に失敗しました。");
-            });
-        });
-    }
 
     // 🎯 履歴ページを開くたびに更新
     window.addEventListener("focus", updateHistory);

@@ -192,7 +192,7 @@ table th {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50%;
+    border-radius: 30%;
     cursor: pointer;
     transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
     box-shadow: 2px 2px 8px rgba(255, 64, 129, 0.4);
@@ -297,4 +297,10 @@ table th {
 
 .sort-buttons button:hover {
     background: #ff6ec7;
+}
+
+.history-checkbox {
+    margin-right: 10px;
+    transform: scale(1.2);
+    cursor: pointer;
 }
