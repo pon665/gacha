@@ -144,6 +144,78 @@ document.addEventListener("DOMContentLoaded", function () {
     initSortButtons();
 });
 
+// 🎯 ガチャを引く
+function pullGacha() {
+    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
+    if (!gachaButton) return;
+
+    gachaButton.disabled = true;
+    const playerName = document.getElementById("player-name").value.trim();
+    const count = parseInt(document.getElementById("gacha-count").value, 10);
+
+    if (!playerName) {
+        alert("リスナー名を入力してください");
+        gachaButton.disabled = false;
+        return;
+    }
+
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+    if (items.length === 0) {
+        alert("景品リストがありません。景品を追加してください。");
+        gachaButton.disabled = false;
+        return;
+    }
+
+let totalRate = items.reduce((sum, item) => sum + (parseFloat(item.rate) || 0), 0).toFixed(2);
+if (totalRate < 100) {
+    alert(`⚠️ 現在の合計確率は ${totalRate}% です。\n\nガチャを回すには確率の合計を 100% にしてください。`);
+    gachaButton.disabled = true;
+    return;
+} else {
+    gachaButton.disabled = false;
+}
+
+    playSound("start");
+    startGachaAnimation();
+
+    let results = {};
+    let probabilityTable = [];
+
+    items.forEach(item => {
+        for (let i = 0; i < item.rate * 100; i++) {
+            probabilityTable.push(item.name);
+        }
+    });
+
+    for (let i = 0; i < count; i++) {
+        let selectedItem = probabilityTable[Math.floor(Math.random() * probabilityTable.length)];
+        results[selectedItem] = (results[selectedItem] || 0) + 1;
+    }
+
+    setTimeout(() => {
+        stopGachaAnimation();
+        playSound("result");
+        showResultPanel(results, playerName);
+        
+        // 🎯 ガチャボタンを有効化（パネルを閉じる前提で一時的に無効化）
+        setTimeout(() => {
+            gachaButton.disabled = false;
+            console.log("✅ ガチャボタンが有効になりました");
+        }, 500); // 短時間の遅延で確実にボタンが押せるようにする
+        // 🎯 ガチャ結果を履歴に保存（修正）
+        let history = JSON.parse(localStorage.getItem("history")) || [];
+
+        history.push({
+            player: playerName,
+            count: count,
+            results: results,
+            timestamp: new Date().toISOString()
+        });
+
+        localStorage.setItem("history", JSON.stringify(history));
+    }, 4800);
+}
+
 // 🎯 結果パネルの表示
 function showResultPanel(results, playerName, imageSrc) {
     console.log("🎰 ガチャ結果パネルを表示");
@@ -208,74 +280,6 @@ function showResultPanel(results, playerName, imageSrc) {
     console.log("✅ ガチャ結果パネルの更新完了");
 }
 
-// 🎯 結果パネルを閉じる
-function closeResultPanel() {
-    console.log("🔄 結果パネルを閉じる");
-    document.getElementById("gacha-result-panel").style.display = "none";
-    document.body.classList.remove("modal-open"); // 🎯 スクロール解除
-}
-// 🎯 ガチャを引く
-function pullGacha() {
-    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
-    if (!gachaButton) return;
-
-    gachaButton.disabled = true;
-    const playerName = document.getElementById("player-name").value.trim();
-    const count = parseInt(document.getElementById("gacha-count").value, 10);
-
-    if (!playerName) {
-        alert("リスナー名を入力してください");
-        gachaButton.disabled = false;
-        return;
-    }
-
-    let items = JSON.parse(localStorage.getItem("items")) || [];
-    if (items.length === 0) {
-        alert("景品リストがありません。景品を追加してください。");
-        gachaButton.disabled = false;
-        return;
-    }
-
-    playSound("start");
-    startGachaAnimation();
-
-    let results = {};
-    let probabilityTable = [];
-
-    items.forEach(item => {
-        for (let i = 0; i < item.rate * 100; i++) {
-            probabilityTable.push(item.name);
-        }
-    });
-
-    for (let i = 0; i < count; i++) {
-        let selectedItem = probabilityTable[Math.floor(Math.random() * probabilityTable.length)];
-        results[selectedItem] = (results[selectedItem] || 0) + 1;
-    }
-
-    setTimeout(() => {
-        stopGachaAnimation();
-        playSound("result");
-        showResultPanel(results, playerName);
-        
-        // 🎯 ガチャボタンを有効化（パネルを閉じる前提で一時的に無効化）
-        setTimeout(() => {
-            gachaButton.disabled = false;
-            console.log("✅ ガチャボタンが有効になりました");
-        }, 500); // 短時間の遅延で確実にボタンが押せるようにする
-        // 🎯 ガチャ結果を履歴に保存（修正）
-        let history = JSON.parse(localStorage.getItem("history")) || [];
-
-        history.push({
-            player: playerName,
-            count: count,
-            results: results,
-            timestamp: new Date().toISOString()
-        });
-
-        localStorage.setItem("history", JSON.stringify(history));
-    }, 4800);
-}
 // 🎯 結果パネルを閉じる処理（ガチャボタンを再有効化）
 function closeResultPanel() {
     console.log("🔄 結果パネルを閉じる");
@@ -363,44 +367,122 @@ function addItem() {
     let name = document.getElementById("item-name").value.trim();
     let rate = parseFloat(document.getElementById("item-rate").value);
 
-    if (!name || rate <= 0 || rate > 100) {
-        alert("正しい値を入力してください");
+    if (!name || isNaN(rate) || rate <= 0 || rate > 100) {
+        alert("⚠️ 正しい確率を入力してください。（1%～100%）");
         return;
     }
 
     let items = JSON.parse(localStorage.getItem("items")) || [];
+
+    // 🎯 追加前の合計確率を計算
+    let currentTotalRate = items.reduce((sum, item) => sum + parseFloat(item.rate || 0), 0);
+    
+    // 🎯 追加後の合計確率
+    let newTotalRate = currentTotalRate + rate;
+
+    // 🎯 100%を超える場合は追加せずにアラートを出す
+    if (newTotalRate > 100) {
+        alert(`⚠️ 現在の確率は ${currentTotalRate.toFixed(2)}% です。\n追加すると ${newTotalRate.toFixed(2)}% になり、100%を超えます。\n景品を追加できません。`);
+        return; // 追加をキャンセル
+    }
+
+    // 🎯 景品を追加
     items.push({ name, rate });
     localStorage.setItem("items", JSON.stringify(items));
+
+    // 🎯 入力欄をリセット
     document.getElementById("item-name").value = "";
     document.getElementById("item-rate").value = "";
-    updateItemList();
-}
 
-function deleteItem(index) {
-    let items = JSON.parse(localStorage.getItem("items")) || [];
-    if (!confirm(`${items[index].name} を削除しますか？`)) return;
-    
-    items.splice(index, 1);
-    localStorage.setItem("items", JSON.stringify(items));
+    // 🎯 景品リストを更新
     updateItemList();
 }
 
 function updateItemList() {
-    let items = JSON.parse(localStorage.getItem("items")) || [];
     const itemList = document.getElementById("item-list");
-    itemList.innerHTML = "";
-    
-     items.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+    const totalRateDisplay = document.getElementById("total-rate-display");
+    const totalItemsDisplay = document.getElementById("total-items-display");
+
+    if (!itemList || !totalRateDisplay || !totalItemsDisplay) {
+        console.error("❌ 必要な要素が見つかりません。");
+        return;
+    }
+
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+
+    // 🎯 五十音順にソート
+    items.sort((a, b) => a.name.localeCompare(b.name, "ja"));
+
+    // 🎯 確率の合計を計算
+    let totalRate = items.reduce((sum, item) => sum + item.rate, 0).toFixed(2);
+
+    // 🎯 合計確率の表示
+    totalRateDisplay.textContent = `${totalRate} / 100%`;
+
+    // 🎯 確率が100%を超えたら警告
+    if (totalRate > 100) {
+        totalRateDisplay.style.color = "red"; // ⚠️ 100%超えたら赤字
+        alert(`⚠️ 現在の確率は ${totalRate}% です。ガチャを回すには100%以下にしてください。`);
+    } else {
+        totalRateDisplay.style.color = "black";
+    }
+
+    // 🎯 景品数を表示
+    totalItemsDisplay.textContent = `景品の数: ${items.length} 個`;
+
+    // 🎯 景品リストを表示
+    itemList.innerHTML = ""; // リストをクリア
 
     items.forEach((item, index) => {
         const div = document.createElement("div");
         div.className = "item-row";
         div.innerHTML = `
-            <span>${item.name} (確率: ${item.rate}%)</span>
-            <button class="delete-button" onclick="deleteItem(${index})">削除</button>
+            <span>${item.name}</span>
+            <span>確率: ${item.rate}%</span>
+            <button class="delete-button" onclick="deleteItem('${item.name}')">削除</button>
         `;
         itemList.appendChild(div);
     });
+
+    console.log("✅ 景品リストを更新しました！");
+}
+
+// 🎯 削除時に景品名で削除する
+function deleteItem(name) {
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+
+    // 🎯 景品名で対象を検索
+    let updatedItems = items.filter(item => item.name !== name);
+
+    if (items.length === updatedItems.length) {
+        alert("❌ 削除対象が見つかりません。");
+        return;
+    }
+
+    if (!confirm(`${name} を削除しますか？`)) return;
+
+    localStorage.setItem("items", JSON.stringify(updatedItems));
+    updateItemList();
+}
+
+function deleteItem(itemName) {
+    let items = JSON.parse(localStorage.getItem("items")) || [];
+
+    // 🎯 削除対象の特定
+    const updatedItems = items.filter(item => item.name !== itemName);
+
+    if (items.length === updatedItems.length) {
+        alert("❌ 削除対象が見つかりません。");
+        return;
+    }
+
+    if (!confirm(`❌ ${itemName} を削除しますか？`)) return;
+
+    // 🎯 更新したリストを保存
+    localStorage.setItem("items", JSON.stringify(updatedItems));
+
+    // 🎯 景品リストを再描画
+    updateItemList();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -440,22 +522,49 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    const resultOverlay = document.querySelector(".result-overlay");
-    const hintText = document.createElement("div");
-    hintText.classList.add("scroll-hint");
-    hintText.innerText = "⬆️ スクロールできます ⬇️";
-    resultOverlay.parentNode.insertBefore(hintText, resultOverlay);
+    setTimeout(() => {
+        const resultOverlay = document.querySelector(".result-overlay");
 
-    function checkScroll() {
-        if (resultOverlay.scrollHeight > resultOverlay.clientHeight) {
-            hintText.style.display = "block";
-        } else {
-            hintText.style.display = "none";
+        if (!resultOverlay) {
+            console.warn("⚠️ .result-overlay の要素が見つかりません。");
+            return;
         }
-    }
 
-    checkScroll();
-    new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
+        // 既にスクロールヒントがある場合は追加しない
+        if (!document.querySelector(".scroll-hint")) {
+            const hintText = document.createElement("div");
+            hintText.classList.add("scroll-hint");
+            hintText.innerText = "⬆️ スクロールできます ⬇️";
+
+            // `.result-overlay` の直前にヒントを追加
+            resultOverlay.parentNode.insertBefore(hintText, resultOverlay);
+        }
+
+        function checkScroll() {
+            const hint = document.querySelector(".scroll-hint");
+            if (!hint) return;
+
+            if (resultOverlay.scrollHeight > resultOverlay.clientHeight) {
+                resultOverlay.style.overflowY = "auto"; // スクロール可能に
+                hint.style.display = "block";
+            } else {
+                resultOverlay.style.overflowY = "hidden"; // スクロール不要
+                hint.style.display = "none";
+            }
+        }
+
+        // 初回チェック
+        checkScroll();
+
+        // 動的に変更があった場合も監視
+        new MutationObserver(checkScroll).observe(resultOverlay, { childList: true, subtree: true });
+
+        // ** 結果パネルを閉じたらスクロールをリセット **
+        document.getElementById("close-button").addEventListener("click", function () {
+            resultOverlay.scrollTop = 0; // スクロール位置をリセット
+            document.querySelector(".scroll-hint").style.display = "none";
+        });
+    }, 500); // 500ms 待機して実行
 });
 
 // 🎯 Service Worker の登録

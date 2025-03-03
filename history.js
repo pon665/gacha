@@ -42,16 +42,41 @@ function updateHistory() {
         return;
     }
 
+    // 🎯 リスナーごとに結果を集約
+    let aggregatedHistory = {};
+    history.forEach(h => {
+        if (!aggregatedHistory[h.player]) {
+            aggregatedHistory[h.player] = {
+                player: h.player,
+                count: h.count,
+                results: {}
+            };
+        } else {
+            aggregatedHistory[h.player].count += h.count;
+        }
+
+        // 🎯 景品のカウントを加算
+        Object.entries(h.results).forEach(([item, count]) => {
+            if (!aggregatedHistory[h.player].results[item]) {
+                aggregatedHistory[h.player].results[item] = 0;
+            }
+            aggregatedHistory[h.player].results[item] += count;
+        });
+    });
+
+    // 🎯 オブジェクトから配列に変換
+    let aggregatedArray = Object.values(aggregatedHistory);
+
     // 🎯 並び替えの適用
     let sortType = localStorage.getItem("sortType") || "newest";
     if (sortType === "newest") {
-        history.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0)); // 🎯 最新順に正しくソート
+        aggregatedArray.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0)); // 🎯 最新順
     } else {
-        history.sort((a, b) => a.player.localeCompare(b.player, "ja")); // 名前順
+        aggregatedArray.sort((a, b) => a.player.localeCompare(b.player, "ja")); // 名前順
     }
 
     // 🎯 履歴を表示
-    history.forEach(h => {
+    aggregatedArray.forEach(h => {
         const historyTile = document.createElement("div");
         historyTile.classList.add("history-tile");
 
@@ -74,7 +99,7 @@ function updateHistory() {
         historyContainer.appendChild(historyTile);
     });
 
-    console.log("📌 ガチャ履歴を最新順（上から新しい順）で更新しました。");
+    console.log("📌 ガチャ履歴を統合して更新しました。");
 }
 // 🎯 並び替え機能のセットアップ
 function initSortButtons() {

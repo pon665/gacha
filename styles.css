@@ -160,18 +160,42 @@ button:hover {
     margin-bottom: 10px;
 }
 
-/* 🎀 結果テキスト */
+/* 🎯 結果パネルのスクロール調整 */
 .result-overlay {
-    max-height: 250px; /* 景品リストの最大高さを制限 */
-    overflow-y: auto; /* 縦スクロールを許可 */
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2列レイアウト */
-    gap: 10px; /* 間隔 */
-    padding: 10px;
-    border: 1px solid #ff80ab;
+    max-height: 300px; /* 必要に応じて高さを調整 */
+    overflow-y: auto; /* 必要ならスクロールを表示 */
+    display: block; /* grid ではなく block に */
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4081;
+    text-shadow: 1px 1px 5px rgba(255, 64, 129, 0.3);
+    margin-bottom: 10px;
+    scrollbar-width: thin; /* Firefox 用 */
+    scrollbar-color: #ff80ab #ffe6ea; /* Firefox 用 */
+}
+
+/* 🎯 Webkit（Chrome, Edge, Safari）用 */
+.result-overlay::-webkit-scrollbar {
+    width: 7px; /* スクロールバーの幅 */
+}
+
+.result-overlay::-webkit-scrollbar-thumb {
+    background-color: #ff80ab; /* スクロールバーの色 */
     border-radius: 10px;
-    scrollbar-width: thin; /* Firefox用 */
-    scrollbar-color: #ff80ab #ffe6ea; /* Firefox用 */
+}
+
+.result-overlay::-webkit-scrollbar-track {
+    background-color: #ffe6ea; /* スクロールバーの背景 */
+}
+
+/* 🎯 スクロールヒント */
+.scroll-hint {
+    text-align: center;
+    font-size: 14px;
+    color: #ff6ec7;
+    margin-top: 5px;
+    opacity: 0.8;
+    display: none; /* 初期状態では非表示 */
 }
 
 /* 🎯 ボタンを横並びに配置 */
@@ -204,20 +228,6 @@ button:hover {
     position: absolute;
 }
 
-
-/* 🎯 Webkit（Chrome, Edge, Safari）用 */
-.result-overlay::-webkit-scrollbar {
-    width: 8px;
-}
-
-.result-overlay::-webkit-scrollbar-thumb {
-    background-color: #ff80ab;
-    border-radius: 10px;
-}
-
-.result-overlay::-webkit-scrollbar-track {
-    background-color: #ffe6ea;
-}
 
 /* 🎀 プレイヤー名 */
 .player-name-text {
@@ -327,6 +337,22 @@ button:hover {
     border: 2px solid #ff80ab;
     padding: 10px;
     text-align: left;
+}
+.item-summary {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 5px;
+    margin-bottom: 3px;
+    background: #fff;
+    border: 3px solid #ff9aa2;
+    border-radius: 5px;
+    display: inline-block;
+}
+/* 🎯 確率と景品数を個別に太文字設定 */
+#total-rate-display,
+#total-items-display {
+    font-weight: bold;
 }
 
 table th {
@@ -448,42 +474,6 @@ table th {
     padding: 5px;
 }
 
-.result-overlay {
-    max-height: 300px;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #ff4081;
-    text-shadow: 1px 1px 5px rgba(255, 64, 129, 0.3);
-    margin-bottom: 10px;
-    scrollbar-width: thin; /* Firefox用 */
-    scrollbar-color: #ff80ab #ffe6ea; /* Firefox用 */
-}
-
-/* Webkit（Chrome, Edge, Safari）用 */
-.result-overlay::-webkit-scrollbar {
-    width: 8px; /* スクロールバーの幅 */
-}
-
-.result-overlay::-webkit-scrollbar-thumb {
-    background-color: #ff80ab; /* スクロールバーの色 */
-    border-radius: 10px;
-}
-
-.result-overlay::-webkit-scrollbar-track {
-    background-color: #ffe6ea; /* スクロールバーの背景 */
-}
-
-.scroll-hint {
-    text-align: center;
-    font-size: 14px;
-    color: #ff6ec7;
-    margin-top: -10px;
-    opacity: 0.8;
-}
 
 /* 🎯 結果パネル表示中のスクロール無効化 */
 .modal-open {

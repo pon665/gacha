@@ -42,6 +42,10 @@
 </div>
     <div class="section">
       <h2>景品リスト</h2>
+      <div class="item-summary">
+    <p id="total-rate-display">0.00 / 100%</p> <!-- 🎯 ここに現在の合計確率を表示 -->
+    <p id="total-items-display">景品の数: 0 個</p>
+</div>
       <div class="item-list" id="item-list"></div>
       <div>
         <input type="text" id="item-name" placeholder="景品名">
@@ -53,6 +57,7 @@
 <div id="gacha-result-panel">
     <h2 id="player-name-display" class="player-name"></h2>
     <img id="result-image" src="" alt="景品画像">
+    <div class="result-overlay">
     <div id="result-list"></div>
     <div class="result-buttons">
         <button id="close-button" onclick="closeResultPanel()">閉じる</button>
