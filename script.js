@@ -195,19 +195,33 @@ saveHistory(playerName, count, results);
     }, 4800);
 }
 
-// 🎯 履歴を保存（既存の履歴と統合する）
+// 🎯 ガチャ履歴を保存（時間順 & 既存リスナーは統合して上に移動）
 function saveHistory(playerName, count, results) {
     let history = JSON.parse(localStorage.getItem("history")) || [];
 
-    // 🎯 既存のリスナーが履歴にある場合は統合
-    let existingEntry = history.find(entry => entry.player === playerName);
-    if (existingEntry) {
-        existingEntry.count += count;
+    // 🎯 既存のリスナーを検索
+    let existingIndex = history.findIndex(entry => entry.player === playerName);
+
+    if (existingIndex !== -1) {
+        // 🎯 既存のリスナーがいた場合、結果を統合して上に移動
+        let existingEntry = history.splice(existingIndex, 1)[0]; // 既存データを取り出し削除
+        existingEntry.count += count; // 回数を追加
+
+        // 🎯 既存の景品と新しい景品を統合
         Object.entries(results).forEach(([item, quantity]) => {
             existingEntry.results[item] = (existingEntry.results[item] || 0) + quantity;
         });
+
+        // 🎯 最新の履歴として上に追加
+        history.unshift(existingEntry);
     } else {
-        history.unshift({ player: playerName, count, results, timestamp: new Date().toISOString() });
+        // 🎯 新しいリスナーならそのまま上に追加
+        history.unshift({
+            player: playerName,
+            count,
+            results,
+            timestamp: new Date().toISOString(),
+        });
     }
 
     localStorage.setItem("history", JSON.stringify(history));
