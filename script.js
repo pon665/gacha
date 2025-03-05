@@ -138,42 +138,36 @@ function stopGachaAnimation() {
     document.getElementById("gacha-frame").src = "image1.png";
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ ページ読み込み完了");
-    updateItemList();
-    initSortButtons();
-});
 
-// 🎯 ガチャを引く
 function pullGacha() {
     const gachaButton = document.querySelector("button[onclick='pullGacha()']");
     if (!gachaButton) return;
 
+    // 🎯 ガチャボタンをすぐに無効化して連打防止
     gachaButton.disabled = true;
+
     const playerName = document.getElementById("player-name").value.trim();
     const count = parseInt(document.getElementById("gacha-count").value, 10);
 
     if (!playerName) {
         alert("リスナー名を入力してください");
-        gachaButton.disabled = false;
+        gachaButton.disabled = false; // 🎯 失敗時は再び有効化
         return;
     }
 
     let items = JSON.parse(localStorage.getItem("items")) || [];
     if (items.length === 0) {
         alert("景品リストがありません。景品を追加してください。");
-        gachaButton.disabled = false;
+        gachaButton.disabled = false; // 🎯 失敗時は再び有効化
         return;
     }
 
-let totalRate = items.reduce((sum, item) => sum + (parseFloat(item.rate) || 0), 0).toFixed(2);
-if (totalRate < 100) {
-    alert(`⚠️ 現在の合計確率は ${totalRate}% です。\n\nガチャを回すには確率の合計を 100% にしてください。`);
-    gachaButton.disabled = true;
-    return;
-} else {
-    gachaButton.disabled = false;
-}
+    let totalRate = items.reduce((sum, item) => sum + (parseFloat(item.rate) || 0), 0).toFixed(2);
+    if (totalRate < 100) {
+        alert(`⚠️ 現在の合計確率は ${totalRate}% です。\n\nガチャを回すには確率の合計を 100% にしてください。`);
+        gachaButton.disabled = false; // 🎯 失敗時は再び有効化
+        return;
+    }
 
     playSound("start");
     startGachaAnimation();
@@ -193,28 +187,37 @@ if (totalRate < 100) {
     }
 
     setTimeout(() => {
+      // 🎯 ガチャ結果を履歴に保存
+saveHistory(playerName, count, results);
         stopGachaAnimation();
         playSound("result");
         showResultPanel(results, playerName);
-        
-        // 🎯 ガチャボタンを有効化（パネルを閉じる前提で一時的に無効化）
-        setTimeout(() => {
-            gachaButton.disabled = false;
-            console.log("✅ ガチャボタンが有効になりました");
-        }, 500); // 短時間の遅延で確実にボタンが押せるようにする
-        // 🎯 ガチャ結果を履歴に保存（修正）
-        let history = JSON.parse(localStorage.getItem("history")) || [];
-
-        history.push({
-            player: playerName,
-            count: count,
-            results: results,
-            timestamp: new Date().toISOString()
-        });
-
-        localStorage.setItem("history", JSON.stringify(history));
     }, 4800);
 }
+
+// 🎯 履歴を保存（既存の履歴と統合する）
+function saveHistory(playerName, count, results) {
+    let history = JSON.parse(localStorage.getItem("history")) || [];
+
+    // 🎯 既存のリスナーが履歴にある場合は統合
+    let existingEntry = history.find(entry => entry.player === playerName);
+    if (existingEntry) {
+        existingEntry.count += count;
+        Object.entries(results).forEach(([item, quantity]) => {
+            existingEntry.results[item] = (existingEntry.results[item] || 0) + quantity;
+        });
+    } else {
+        history.unshift({ player: playerName, count, results, timestamp: new Date().toISOString() });
+    }
+
+    localStorage.setItem("history", JSON.stringify(history));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ ページ読み込み完了");
+    updateItemList();
+    initSortButtons();
+});
 
 // 🎯 結果パネルの表示
 function showResultPanel(results, playerName, imageSrc) {
@@ -280,7 +283,7 @@ function showResultPanel(results, playerName, imageSrc) {
     console.log("✅ ガチャ結果パネルの更新完了");
 }
 
-// 🎯 結果パネルを閉じる処理（ガチャボタンを再有効化）
+// 🎯 結果パネルを閉じた時にガチャボタンを再び有効化
 function closeResultPanel() {
     console.log("🔄 結果パネルを閉じる");
     const resultPanel = document.getElementById("gacha-result-panel");
@@ -292,11 +295,11 @@ function closeResultPanel() {
     document.body.classList.remove("modal-open"); // 🎯 スクロール解除
     resetGachaInputs(); // 🎯 入力リセット
 
-    // 🎯 ガチャボタンを確実に再有効化
- const gachaButton = document.getElementById("gacha-button");
+    // 🎯 ガチャボタンを再有効化
+    const gachaButton = document.querySelector("button[onclick='pullGacha()']");
     if (gachaButton) {
         gachaButton.disabled = false;
-        console.log("✅ ガチャボタンが有効になりました");
+        console.log("✅ ガチャボタンが再び押せるようになりました");
     }
 }
 
